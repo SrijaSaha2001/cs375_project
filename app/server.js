@@ -12,6 +12,16 @@ let hostname = "localhost";
 
 io.on('connection', (socket) => {
     console.log('A user connected');
+    socket.on('joinRoom', (roomName) => {
+        socket.join(roomName);
+    });
+    socket.on('messageToRoom', (data) => {
+        const { room, message } = data;
+    });
+
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
+    });
 });
 
 app.listen(port, hostname, () => {
