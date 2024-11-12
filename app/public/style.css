@@ -1,0 +1,45 @@
+body {
+    margin: 0px;
+    padding: 20px;
+    font-family: "Times New Roman";
+    background-image: url("https://i.pinimg.com/564x/d9/52/e9/d952e923fb982e8311989359c4e7f9c0.jpg");
+}
+
+canvas{
+    box-shadow: -1px 2px 9px 6px pink;
+    cursor: pointer;
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+}
+
+.tools {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin-top: 15px;
+}
+.tools .color{
+    height: 30px;
+    width: 30px;
+    min-height: 30px;
+    min-width: 30px;
+    cursor:pointer;
+    display: inline-block;
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 2px solid white;
+    align-self: center;
+    margin: 0 10px;
+}
+.tools .button {
+    border: 2px solid black;
+    cursor: pointer;
+    margin: 0 10px;
+}
+.banner {
+    background-color: lightpink;
+    align-items: center;
+}
