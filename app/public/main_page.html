@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" 
+      content="width=device-width, 
+      initial-scale=1">
+    <title>Main Page</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+
+  <body>
+    <img src="lib.png" width="300">
+    <br>
+    <!--<div class="banner">
+      <img src="https://media.tenor.com/nEoz_3Q6_1YAAAAj/hourglass-time.gif" height="50">
+      <span id="timer">60</span>
+    </div>-->
+    <br>
+    <div class="field">
+        <canvas id="canvas"></canvas>
+        <div class="tools">
+            <button type = "button" class="button"><img src="undo.jpg" width="30" height="30"></button>
+            <button type = "button" class="reset">RESET</button>
+
+            <button onClick="changeColor(this)" type="color" class="color" style="background: red;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: orange;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: yellow;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: green;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: blue;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: indigo;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: violet;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: black;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: white;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: grey;"></button>
+            <button onClick="changeColor(this)" type="color" class="color" style="background: brown;"></button>
+            <input type="range" min="1" max="100" class="range" onInput="changeSize(this.value)" >
+        </div>
+        
+    </div>
+    
+  </body>
+
+  <script src="canvas.js"></script>
+
+</html>
