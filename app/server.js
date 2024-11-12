@@ -12,6 +12,9 @@ let hostname = "localhost";
 
 io.on('connection', (socket) => {
     console.log('A user connected');
+    function onConnection(socket) {
+        socket.on('drawing', (data) => socket.broadcast.emit('drawing', data))
+    }
     socket.on('joinRoom', (roomName) => {
         socket.join(roomName);
     });
@@ -24,6 +27,6 @@ io.on('connection', (socket) => {
     });
 });
 
-app.listen(port, hostname, () => {
+server.listen(port, hostname, () => {
     console.log(`http://${hostname}:${port}`);
 });
