@@ -43,3 +43,40 @@ canvas{
     background-color: lightpink;
     align-items: center;
 }
+table.players, table.chat {
+    border: 3px solid lightseagreen; 
+    background-color: darkslateblue;
+    height: 550px;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+}
+table.settings {
+    border: 3px solid lightseagreen;
+    background-color: darkslateblue;
+    height: 550px;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+}
+.right {
+    width: 200px;
+    float: right;
+    text-align: left;
+}
+textarea {
+    height: 200px;
+    width: 400px;
+    float: right;
+}
+label {
+    text-decoration-line: underline;
+}
+button.start {
+    height: 75px;
+    width: 800px;
+    background-color: lime;
+    font-size: large;
+}

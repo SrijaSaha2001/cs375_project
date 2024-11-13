@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" 
+      content="width=device-width, 
+      initial-scale=1">
+    <title>Settings</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+
+  <body>
+    <img src="lib.png" width="300">
+    <br>
+    <!--<div class="banner">
+      <img src="https://media.tenor.com/nEoz_3Q6_1YAAAAj/hourglass-time.gif" height="50">
+      <span id="timer">60</span>
+    </div>-->
+    <br>
+    <div class="field">
+        <table>
+            <tr>
+                <td>
+                    <table class="players">
+                        <tr>
+                            <th>Players</th>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="settings">
+                        <tr class="settings">
+                            <th style="color:white; font-size:x-large;">Room Settings</th>
+                        </tr>
+                        <tr class="settings">
+                            <td>
+                                <label for="players" style="color:white;">Players:</label>
+                                <select class="right" id="players" name="players">
+                                    <option value=2>2</option>
+                                    <option value=3>3</option>
+                                    <option value=4>4</option>
+                                    <option value=5>5</option>
+                                    <option value=6>6</option>
+                                    <option value=7>7</option>
+                                    <option value=8>8</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="settings">
+                            <td>
+                                <label for="drawtime" style="color:white;">Draw Time:</label>
+                                <select class="right" id="drawtime" name="drawtime">
+                                    <option value=20>20</option>
+                                    <option value=30>30</option>
+                                    <option value=40>40</option>
+                                    <option value=50>50</option>
+                                    <option value=60>60</option>
+                                    <option value=70>70</option>
+                                    <option value=80>80</option>
+                                    <option value=90>90</option>
+                                    <option value=100>100</option>
+                                    <option value=110>110</option>
+                                    <option value=120>120</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="settings">
+                            <td>
+                                <label for="rounds" style="color:white;">Rounds:</label>
+                                <select class="right" id="rounds" name="rounds">
+                                    <option value=2>2</option>
+                                    <option value=3>3</option>
+                                    <option value=4>4</option>
+                                    <option value=5>5</option>
+                                    <option value=6>6</option>
+                                    <option value=7>7</option>
+                                    <option value=8>8</option>
+                                    <option value=9>9</option>
+                                    <option value=10>10</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="setting">
+                            <td>
+                                <label for="wordcount" style="color:white;">Word Count:</label>
+                                <select class="right" id="wordcount" name="wordcount">
+                                    <option value=1>1</option>
+                                    <option value=2>2</option>
+                                    <option value=3>3</option>
+                                    <option value=4>4</option>
+                                    <option value=5>5</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="settings">
+                            <td>
+                                <label for="hints" style="color:white;">Hints:</label>
+                                <select class="right" id="hints" name="hints">
+                                    <option value=0>0</option>
+                                    <option value=1>1</option>
+                                    <option value=2>2</option>
+                                    <option value=3>3</option>
+                                    <option value=4>4</option>
+                                    <option value=5>5</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="settings">
+                            <td>
+                                <label for="custom" style="color:white;">Custom Words:</label>
+                                <textarea id="custom" name="custom"> </textarea>
+                            </td>
+                        </tr>
+                        <tr class="settings">
+                            <td>
+                                <label for="customcheck" style="color:white;">Use custom words only:</label>
+                                <input type="checkbox" id="customcheck">
+                            </td>
+                        </tr>
+                        <tr class="settings">
+                            <td>
+                                <button class="start" id="start">Start Game!</button>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="chat">
+                        <tr>
+                            <th>Chat</th>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        
+    </div>
+    
+  </body>
+
+  <script src="main_page.js"></script>
+
+</html>
