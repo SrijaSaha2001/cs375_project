@@ -6,7 +6,7 @@ body {
 }
 
 canvas{
-    box-shadow: -1px 2px 9px 6px pink;
+    box-shadow: -1px 2px 9px 6px lightseagreen;
     cursor: pointer;
         padding-left: 0;
         padding-right: 0;
@@ -40,7 +40,7 @@ canvas{
     margin: 0 10px;
 }
 .banner {
-    background-color: lightpink;
+    background-color: lightseagreen;
     align-items: center;
 }
 table.players, table.chat {
@@ -79,4 +79,42 @@ button.start {
     width: 800px;
     background-color: lime;
     font-size: large;
+}
+.mainchat, .mainplayers{
+    border: 3px solid purple; 
+    background-color: white;
+    height: 550px;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+}
+.chatbox {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    margin-top: 2rem;
+    letter-spacing: 0.5px;
+}
+.page {
+    padding: 0 0 50px 0;
+}
+.inbox {
+    border: 2px dotted purple;
+    overflow: hidden;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+.chats {
+    padding: 30px 15px 0 25px;
+}
+.msgpg {
+    max-height: 500px;
+    overflow-y: auto;
+}
+.bottom {
+    border-top: 2px solid lightseagreen;
+    position: relative;
+    height: 15%;
+    background-color: lavender;
 }
