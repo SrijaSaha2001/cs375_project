@@ -10,6 +10,23 @@ let io = socketIo(server);
 let port = 3000;
 let hostname = "localhost";
 
+app.use(express.static("public"));
+app.use(express.json())
+
+app.post("/game_page", (req, res) => {
+    if(req.body.room !== undefined)
+    {
+      res.statusCode = 200
+      socket.join(req.body.room);
+      res.send();
+    }
+    else {
+    res.status(400).send();
+    }
+});
+app.listen(port, hostname, () => {
+    console.log(`http://${hostname}:${port}`);
+});
 io.on('connection', (socket) => {
     console.log('A user connected');
     function onConnection(socket) {
@@ -27,6 +44,3 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(port, hostname, () => {
-    console.log(`http://${hostname}:${port}`);
-});
