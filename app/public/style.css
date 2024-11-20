@@ -1,7 +1,7 @@
 body {
     margin: 0px;
-    width: 100vw;
-    height: 100vh;
+    width:fit-content;
+    height:fit-content;
     padding: 20px;
     font-family: "Times New Roman";
     background-image: url("https://i.pinimg.com/564x/d9/52/e9/d952e923fb982e8311989359c4e7f9c0.jpg");
