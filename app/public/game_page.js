@@ -5,7 +5,8 @@ let button = document.getElementById("join");
 
 button.addEventListener("click", () => {
     socket.emit('joinRoom', roomName)
-    fetch("/game_page", {
+    window.location.href="lobby_page.html";
+    /*fetch("/game_page", {
         method: "POST",
         headers: {
         "Content-Type": "application/json"
@@ -19,7 +20,8 @@ button.addEventListener("click", () => {
         else {
             message.textContent = "Bad request"
         }
+        window.location.href="lobby_page.html";
     }).catch(error => {
         console.log(error);
-    });
+    });*/
 })
