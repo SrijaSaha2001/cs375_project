@@ -1,4 +1,4 @@
-const socket = io();
+/*const socket = io();
 
 let chatBoard = document.getElementById("chatBoard");
 
@@ -6,14 +6,14 @@ socket.on('message', (message) => {
     let new_message = document.createElement('p');
     new_message.textContent = message;
     chatBoard.append(new_message);
-}) 
+})*/
 
 let canvas = document.getElementById("canvas");
 let reset = document.getElementsByClassName("reset");
 let context = canvas.getContext("2d");
 
-canvas.width = 500;
-canvas.height = 500;
+//canvas.width = 500;
+//canvas.height = 500;
 let startcol = "white";
 context.fillStyle = startcol;
 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -35,15 +35,19 @@ reset.addEventListener("click", clear);
 function start(event) {
     drawing = true;
     context.beginPath();
-    context.moveTo(event.clientX - canvas.offsetLeft,
-                    event.clientY - canvas.offsetTop);
+    // context.moveTo(event.clientX - canvas.offsetLeft,
+    //                 event.clientY - canvas.offsetTop);
+    context.moveTo(event.offsetX,
+                event.offsetY);
     event.preventDefault();
 }
 
 function draw(event) {
     if(drawing === true) {
-        context.lineTo(event.clientX - canvas.offsetLeft, 
-                        event.clientY - canvas.offsetTop);
+        // context.lineTo(event.clientX - canvas.offsetLeft, 
+        //                 event.clientY - canvas.offsetTop);
+        context.lineTo(event.offsetX, 
+            event.offsetY);
         context.strokeStyle = drawcolor;
         context.lineWidth = drawwidth;
         context.lineJoin = "round";
