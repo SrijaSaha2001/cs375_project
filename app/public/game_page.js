@@ -5,7 +5,7 @@ let button = document.getElementById("join");
 
 button.addEventListener("click", () => {
     socket.emit('joinRoom', roomName)
-    window.location.href="lobby_page.html";
+    window.location.href="main_page.html";
     /*fetch("/game_page", {
         method: "POST",
         headers: {
