@@ -91,91 +91,20 @@ button.start {
     margin-right: auto;
     border-collapse: collapse;
 }
-.chatbox {
-    width: 100%;
-    height: 100%;
-    margin: auto;
-    margin-top: 2rem;
-    letter-spacing: 0.5px;
+.chatlog {
+    background-color: white;
+    border: 2px;
+    border-color: blueviolet;
+    overflow-y: scroll;
 }
-.page {
-    padding: 0 0 50px 0;
-}
-.inbox {
-    border: 2px solid purple;
-    overflow: hidden;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-}
-.chats {
-    padding: 30px 15px 0 25px;
-}
-.msgpg {
-    max-height: 500px;
-    overflow-y: auto;
-}
-.bottom {
-    border-top: 2px solid lightseagreen;
-    position: relative;
-    height: 15%;
-    background-color: lavender;
-}
-.inputt {
-    float: right;
-    margin-top: 13px;
-    margin-right: 20px;
-    outline: none;
-    border-radius: 20px;
-    width: 60%;
-    background-color: purple;
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-}
-.inputt>.control {
-    position: relative;
-    flex: 1 1 auto;
-    width: 2%;
-    margin-bottom: 0;
-}
-.control {
-    border: none;
-    border-radius: 20px;
-    display: block;
-    height: calc(2.25rem + 2px);
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: grey;
-    background-color:lightseagreen;
-    background-clip: padding-box;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-.inputt-text {
-    background: transparent;
-    border: none;
-    display: flex;
-    align-items: center;
-    padding: 0.375rem 0.75rem;
-    margin-bottom: 0;
-    font-size: 1.5rem;
-    font-weight: b;
-    line-height: 1.5;
-    color: grey;
-    text-align: center;
-    white-space: nowrap;
+.greyline {
     background-color: lightgrey;
-    border: 1px solid lightgrey;
-    border-radius: 0.25rem;
-    font-weight: bold;
-    cursor: pointer;
 }
-input:focus {
-    outline: none;
-    border: none;
-    box-shadow: none;
+.whiteline {
+    background-color: white;
 }
-.send {
-    font-weight: bold;
+.timer {
+    background-color: lightseagreen;
+    height: 20px;
+    width: 20px;
 }
