@@ -12,11 +12,8 @@ socket.on('message', (message) => {
 })
 
 let canvas = document.getElementById("canvas");
-let reset = document.getElementsByClassName("reset");
 let context = canvas.getContext("2d");
 
-//canvas.width = 500;
-//canvas.height = 500;
 let startcol = "white";
 context.fillStyle = startcol;
 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -34,24 +31,11 @@ canvas.addEventListener("mouseup", stop, false);
 canvas.addEventListener("touchend", stop, false);
 canvas.addEventListener("mouseout", stop, false);
 //reset.addEventListener("click", clear);
+//chatInput.addEventListener("click", send);
 
-fetch("words.txt").then((res) => 
-    res.text()
-    ).then((text) => {
-    var arrayOfWords = text.split(",")
-    var num1 = Math.floor(Math.random() * arrayOfWords.length);
-    var num2 = Math.floor(Math.random() * arrayOfWords.length);
-    var num3 = Math.floor(Math.random() * arrayOfWords.length);
-    console.log("Word 1: ", arrayOfWords[num1])
-    console.log("Word 2: ", arrayOfWords[num2])
-    console.log("Word 3: ", arrayOfWords[num3])
-   }).catch((e) => 
-    console.error(e));
 function start(event) {
     drawing = true;
     context.beginPath();
-    // context.moveTo(event.clientX - canvas.offsetLeft,
-    //                 event.clientY - canvas.offsetTop);
     context.moveTo(event.offsetX,
                 event.offsetY);
     event.preventDefault();
@@ -59,8 +43,6 @@ function start(event) {
 
 function draw(event) {
     if(drawing === true) {
-        // context.lineTo(event.clientX - canvas.offsetLeft, 
-        //                 event.clientY - canvas.offsetTop);
         context.lineTo(event.offsetX, 
             event.offsetY);
         context.strokeStyle = drawcolor;
@@ -87,14 +69,14 @@ function changeSize(value) {
     drawwidth = value;
 }
 
-function clear(event) {
+/*function clear(event) {
     context.fillStyle = startcol;
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 let count = 60;
-let timer = document.getElementById("timer")
+let timer = getElementById("timer")
   setInterval(function () {
     count--;
     timer.textContent = count;
@@ -102,4 +84,22 @@ let timer = document.getElementById("timer")
     if(count < 0) {
         clearInterval(timer);
     }
-  }, 1000);
+  }, 1000);*/
+
+  let grey = true;
+
+  function send(event) {
+        let log = document.getElementById("logs");
+        let input = document.getElementById("input");
+        inputVal = input.value;
+        let div = document.createElement("div");
+        div.textContent = inputVal;
+        if (grey) {
+            div.classList.add("greyline");
+          } else {
+            div.classList.add("whiteline");
+          }
+        grey = !grey;
+        log.append(div);
+        input.value = " ";
+  }
