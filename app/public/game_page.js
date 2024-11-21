@@ -4,6 +4,7 @@ let roomName = document.getElementById("roomName");
 let button = document.getElementById("join");
 
 button.addEventListener("click", () => {
+    console.log(roomName)
     socket.emit('joinRoom', roomName)
     window.location.href="main_page.html";
     /*fetch("/game_page", {

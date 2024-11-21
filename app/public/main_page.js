@@ -1,7 +1,10 @@
-const socket = io();
-
+const socket = io(location.host);
+socket.on("connect", () => {
+    console.log(socket.id); // ojIckSD2jqNzOqIrAGzL
+  });
 let chatBoard = document.getElementById("chatBoard");
 
+console.log("Hello")
 socket.on('message', (message) => {
     let new_message = document.createElement('p');
     new_message.textContent = message;
@@ -30,8 +33,20 @@ canvas.addEventListener("mousemove", draw, false);
 canvas.addEventListener("mouseup", stop, false);
 canvas.addEventListener("touchend", stop, false);
 canvas.addEventListener("mouseout", stop, false);
-reset.addEventListener("click", clear);
+//reset.addEventListener("click", clear);
 
+fetch("words.txt").then((res) => 
+    res.text()
+    ).then((text) => {
+    var arrayOfWords = text.split(",")
+    var num1 = Math.floor(Math.random() * arrayOfWords.length);
+    var num2 = Math.floor(Math.random() * arrayOfWords.length);
+    var num3 = Math.floor(Math.random() * arrayOfWords.length);
+    console.log("Word 1: ", arrayOfWords[num1])
+    console.log("Word 2: ", arrayOfWords[num2])
+    console.log("Word 3: ", arrayOfWords[num3])
+   }).catch((e) => 
+    console.error(e));
 function start(event) {
     drawing = true;
     context.beginPath();
@@ -79,7 +94,7 @@ function clear(event) {
 }
 
 let count = 60;
-let timer = getElementById("timer")
+let timer = document.getElementById("timer")
   setInterval(function () {
     count--;
     timer.textContent = count;
