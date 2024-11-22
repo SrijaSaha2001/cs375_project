@@ -23,9 +23,9 @@ let port = 3000;
 let hostname = "localhost";
 
 app.use(express.static("public"));
-app.use(express.json())
+//app.use(express.json())
 
-app.post("/game_page", (req, res) => {
+/*app.post("/game_page", (req, res) => {
     if(req.body.room !== undefined)
     {
       res.statusCode = 200
@@ -35,7 +35,7 @@ app.post("/game_page", (req, res) => {
     else {
     res.status(400).send();
     }
-});
+});*/
 server.listen(port, hostname, () => {
     console.log(`http://${hostname}:${port}`);
 });

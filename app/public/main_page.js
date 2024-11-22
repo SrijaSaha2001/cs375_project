@@ -143,4 +143,3 @@ let count = 60;
         log.append(div);
         input.value = " ";
   }
-  }, 1000);*/
