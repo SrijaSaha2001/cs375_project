@@ -11,9 +11,14 @@ socket.on('message', (message) => {
     chatBoard.append(new_message);
 })
 
-let canvas = document.getElementById("canvas");
-let context = canvas.getContext("2d");
 
+let canvas = document.getElementById("canvas");
+//let reset = document.getElementsByClassName("reset");
+let context = canvas.getContext("2d");
+//let chatInput = document.getElementById("enterText");
+
+//canvas.width = 500;
+//canvas.height = 500;
 let startcol = "white";
 context.fillStyle = startcol;
 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -23,59 +28,41 @@ let drawcolor = "black";
 let drawwidth = "5";
 let drawing = false;
 
-canvas.addEventListener("touchstart", start, false);
-canvas.addEventListener("touchmove", draw, false);
-canvas.addEventListener("mousedown", start, false);
-canvas.addEventListener("mousemove", draw, false);
-canvas.addEventListener("mouseup", stop, false);
-canvas.addEventListener("touchend", stop, false);
-canvas.addEventListener("mouseout", stop, false);
+let players = 5;
+let user = 3;
+let role = "drawer"
+
+window.addEventListener("load", function () {
+    for (let usernum = 1; usernum < players; usernum++) {
+    if (usernum === user){
+        role = "drawer";
+    }
+    else {
+        role = "guesser";
+    }
+    
+
+    if (role === "drawer") {
+    canvas.addEventListener("touchstart", start, false);
+    canvas.addEventListener("touchmove", draw, false);
+    canvas.addEventListener("mousedown", start, false);
+    canvas.addEventListener("mousemove", draw, false);
+    canvas.addEventListener("mouseup", stop, false);
+    canvas.addEventListener("touchend", stop, false);
+    canvas.addEventListener("mouseout", stop, false);
+    }
+    }
+  })
+
+
 //reset.addEventListener("click", clear);
+//chatInput.addEventListener("click", send);
 
-let popup = document.getElementById("popup");
-let choice1 = document.getElementById("choice1");
-let choice2 = document.getElementById("choice2");
-let choice3 = document.getElementById("choice3");
-let currentChoice = ""
-
-function showDiv() {
-    console.log("Loaded")
-    popup.style.display = "flex"
-}
-window.onload = function(){
-    setTimeout(showDiv, 3000);
-}
-choice1.addEventListener("click", () => {
-    currentChoice = choice1.textContent
-    popup.style.display = "none"
-});
-choice2.addEventListener("click", () => {
-    currentChoice = choice2.textContent
-    popup.style.display = "none"
-});
-choice3.addEventListener("click", () => {
-    currentChoice = choice3.textContent
-    popup.style.display = "none"
-});
-console.log("Current choice: ", currentChoice)
-fetch("words.txt").then((res) => 
-    res.text()
-    ).then((text) => {
-    var arrayOfWords = text.split(",")
-    var num1 = Math.floor(Math.random() * arrayOfWords.length);
-    var num2 = Math.floor(Math.random() * arrayOfWords.length);
-    var num3 = Math.floor(Math.random() * arrayOfWords.length);
-    console.log("Word 1: ", arrayOfWords[num1])
-    choice1.textContent = arrayOfWords[num1]
-    console.log("Word 2: ", arrayOfWords[num2])
-    choice2.textContent = arrayOfWords[num2]
-    console.log("Word 3: ", arrayOfWords[num3])
-    choice3.textContent = arrayOfWords[num3]
-   }).catch((e) => 
-    console.error(e));
 function start(event) {
     drawing = true;
     context.beginPath();
+    // context.moveTo(event.clientX - canvas.offsetLeft,
+    //                 event.clientY - canvas.offsetTop);
     context.moveTo(event.offsetX,
                 event.offsetY);
     event.preventDefault();
@@ -83,6 +70,8 @@ function start(event) {
 
 function draw(event) {
     if(drawing === true) {
+        // context.lineTo(event.clientX - canvas.offsetLeft, 
+        //                 event.clientY - canvas.offsetTop);
         context.lineTo(event.offsetX, 
             event.offsetY);
         context.strokeStyle = drawcolor;
@@ -116,7 +105,7 @@ function changeSize(value) {
 }
 
 let count = 60;
-/*let timer = document.getElementById("timer")
+let timer = getElementById("timer")
   setInterval(function () {
     count--;
     timer.textContent = count;
