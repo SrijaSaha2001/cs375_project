@@ -21,7 +21,16 @@
     <img src="lib.png" width="300">
     <br>
     <div class="banner">
-      <img src="https://media.tenor.com/nEoz_3Q6_1YAAAAj/hourglass-time.gif" height="50">
+      <table>
+        <tr>
+          <td>
+            <div class="timer">60</div>
+            <img src="https://media.tenor.com/nEoz_3Q6_1YAAAAj/hourglass-time.gif" height="50">
+          </td>
+          <td>Round x of y</td>
+          <td>Clue</td>
+        </tr>
+      </table>
     </div>
     <br>
     <table>
@@ -60,24 +69,20 @@
               <td>
                 <table class="mainchat">
                   <tr>
+                    <th style="font-weight: bold; font-size: large;">CHAT</th>
+                  </tr>
+                  <tr>
                     <td>
-                      <div class="chatbox">
-                        <div class="page">
-                          <div class="inbox" >
-                            <div class="chats">
-                              <div class="msgpg">
-                              </div>
-                            </div>
-                            <div class="bottom">
-                              <div class="inputt">
-                                <input type="text" class="control" placeholder="Enter your guess...">
-                                <div class="inputappend">
-                                  <span class="inputt-text send"><i class="bis"></i></span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      <div class="chatlog" style="height: 550px;">
+                        <p id="logs"></p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div>
+                        <input style="height: 20px; width: 230px; align-items: center;" placeholder="Enter your guess..." type="text" id="input"></input>
+                        <button id="enterText" onclick="send()">send</button>
                       </div>
                     </td>
                   </tr>                  
@@ -91,8 +96,7 @@
     
     
   </body>
-
-  <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script src="main_page.js"></script>
 
 </html>

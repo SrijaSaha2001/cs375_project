@@ -5,6 +5,11 @@ let button = document.getElementById("join");
 
 button.addEventListener("click", () => {
     let roomName = document.getElementById("roomName").value;
+
+let joinButton = document.getElementById("join");
+let roomName = document.getElementById("roomName");
+
+joinButton.addEventListener("click", () => {
     console.log(roomName)
     sessionStorage.setItem('roomName', roomName)
     socket.emit('joinRoom', roomName)
