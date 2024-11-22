@@ -35,6 +35,32 @@ canvas.addEventListener("touchend", stop, false);
 canvas.addEventListener("mouseout", stop, false);
 //reset.addEventListener("click", clear);
 
+let popup = document.getElementById("popup");
+let choice1 = document.getElementById("choice1");
+let choice2 = document.getElementById("choice2");
+let choice3 = document.getElementById("choice3");
+let currentChoice = ""
+
+function showDiv() {
+    console.log("Loaded")
+    popup.style.display = "flex"
+}
+window.onload = function(){
+    setTimeout(showDiv, 3000);
+}
+choice1.addEventListener("click", () => {
+    currentChoice = choice1.textContent
+    popup.style.display = "none"
+});
+choice2.addEventListener("click", () => {
+    currentChoice = choice2.textContent
+    popup.style.display = "none"
+});
+choice3.addEventListener("click", () => {
+    currentChoice = choice3.textContent
+    popup.style.display = "none"
+});
+console.log("Current choice: ", currentChoice)
 fetch("words.txt").then((res) => 
     res.text()
     ).then((text) => {
@@ -43,8 +69,11 @@ fetch("words.txt").then((res) =>
     var num2 = Math.floor(Math.random() * arrayOfWords.length);
     var num3 = Math.floor(Math.random() * arrayOfWords.length);
     console.log("Word 1: ", arrayOfWords[num1])
+    choice1.textContent = arrayOfWords[num1]
     console.log("Word 2: ", arrayOfWords[num2])
+    choice2.textContent = arrayOfWords[num2]
     console.log("Word 3: ", arrayOfWords[num3])
+    choice3.textContent = arrayOfWords[num3]
    }).catch((e) => 
     console.error(e));
 function start(event) {
@@ -94,7 +123,7 @@ function clear(event) {
 }
 
 let count = 60;
-let timer = document.getElementById("timer")
+/*let timer = document.getElementById("timer")
   setInterval(function () {
     count--;
     timer.textContent = count;
@@ -102,4 +131,4 @@ let timer = document.getElementById("timer")
     if(count < 0) {
         clearInterval(timer);
     }
-  }, 1000);
+  }, 1000);*/
