@@ -2,14 +2,42 @@
 <html>
 
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" 
+      content="width=device-width, 
+      initial-scale=1">
+    <title>Slibb.io</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
     <body>
+      <img src="lib.png" width="300">
+
         <p>
-            <div>
-                <label for="GameRoom">Game room:</label>
-                <input id="roomName" type="text" name="title">
-            </div>
-            <div>
-                <button id="join">Join room</button>
+            <div class="field">
+              <table class="start">
+                <tr>
+                  <td style="text-align: center;">
+                    <input id="username" type="text" placeholder="Enter your name" style="font-size: xx-large;">
+                  </td>
+                </tr>
+                <tr id="icon">
+                  <td style="text-align: center;">
+                    <img src="icons/icon-test.png" height="200 "width="200">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">
+                    <button class="create" id="create" style="font-size: xx-large;">Create new room!</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center; font-size: xx-large;">
+                    <label for="GameRoom">Join with a room code:</label>
+                    <input id="roomName" type="text" name="title" style="height: 50px; width: 200px">
+                    <button id="join" class="join">Play!</button>
+                  </td>
+                </tr>
+              </table>
             </div>
         </p>
         <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>

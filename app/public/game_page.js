@@ -1,9 +1,9 @@
 let socket = io();
 
+let joinButton = document.getElementById("join");
 let roomName = document.getElementById("roomName");
-let button = document.getElementById("join");
 
-button.addEventListener("click", () => {
+joinButton.addEventListener("click", () => {
     console.log(roomName)
     socket.emit('joinRoom', roomName)
     window.location.href="main_page.html";

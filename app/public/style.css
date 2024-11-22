@@ -63,6 +63,15 @@ table.settings {
     margin-right: auto;
     border-collapse: collapse;
 }
+table.start {
+    border: 3px solid lightseagreen;
+    background-color: darkslateblue;
+    height: 550px;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+}
 .right {
     width: 200px;
     float: right;
@@ -79,6 +88,18 @@ label {
 button.start {
     height: 75px;
     width: 800px;
+    background-color: lime;
+    font-size: large;
+}
+button.create {
+    height: 75px;
+    width: 500px;
+    background-color: lime;
+    font-size: large;
+}
+button.join {
+    height: 50px;
+    width: 200px;
     background-color: lime;
     font-size: large;
 }
