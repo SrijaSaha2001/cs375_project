@@ -1,12 +1,16 @@
 let socket = io();
 
-let roomName = document.getElementById("roomName");
+
 let button = document.getElementById("join");
 
 button.addEventListener("click", () => {
+    let roomName = document.getElementById("roomName").value;
     console.log(roomName)
+    sessionStorage.setItem('roomName', roomName)
     socket.emit('joinRoom', roomName)
-    window.location.href="main_page.html";
+    console.log("Client")
+    //window.location.href="main_page.html";
+    window.open("main_page.html", '_blank').focus();
     /*fetch("/game_page", {
         method: "POST",
         headers: {
