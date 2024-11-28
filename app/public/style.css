@@ -154,3 +154,25 @@ button.join {
 .choices:hover {
     background-color: #033254;
 }
+.newpopup {
+    position:absolute;
+    top: 20px;
+    left: 50%;
+    margin-top: 40%;
+    margin-left: 35%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    display: none;
+    width: 40%;
+    height: 40%
+}
+.blanks {
+    position: absolute;
+    display: None;
+    margin-left: 50%;
+    margin-top: 2.5%;
+    display: flex;
+    font-size: 30px;
+}
