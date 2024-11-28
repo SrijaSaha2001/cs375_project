@@ -62,6 +62,22 @@ io.on('connection', (socket) => {
         //console.log(socket.rooms)
     });
 
+    socket.on('drawing', (data) => {
+        socket.to(data.room).emit('drawing', data);
+    });
+
+    socket.on('popupText', (roomName, text) => {
+        // Emit to all clients in the room
+        io.to(roomName).emit('showPopup', text);
+    });
+
+    socket.on('checkRoom', (room) => {
+        const roomCount = io.sockets.adapter.rooms.get(room)?.size || 0;
+        console.log(`Room ${room} has ${roomCount} sockets.`);
+        socket.emit('roomCount', roomCount); // Send back the number of sockets in the room
+    });
+
+
     socket.on('sendData', (roomName, data) => {
         io.to(roomName).emit('showPopUp', data);
         //console.log(`Emitting data to room ${roomName}:`, data);
@@ -75,5 +91,7 @@ io.on('connection', (socket) => {
     socket.on('messageToRoom', (data) => {
         const { room, message } = data;
     });
+    
+io.to('jkjk').emit('showPopup', 'This is a popup message!');
 });
 

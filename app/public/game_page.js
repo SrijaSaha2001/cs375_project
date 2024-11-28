@@ -5,17 +5,14 @@ let button = document.getElementById("join");
 
 button.addEventListener("click", () => {
     let roomName = document.getElementById("roomName").value;
-
-let joinButton = document.getElementById("join");
-let roomName = document.getElementById("roomName");
-
-joinButton.addEventListener("click", () => {
     console.log(roomName)
     sessionStorage.setItem('roomName', roomName)
     socket.emit('joinRoom', roomName)
     console.log("Client")
     //window.location.href="main_page.html";
     window.open("main_page.html", '_blank').focus();
+    
+    
     /*fetch("/game_page", {
         method: "POST",
         headers: {
