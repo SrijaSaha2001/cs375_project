@@ -9,8 +9,9 @@ button.addEventListener("click", () => {
     sessionStorage.setItem('roomName', roomName)
     socket.emit('joinRoom', roomName)
     console.log("Client")
+    let url = 'main_page.html?room=' + roomName
     //window.location.href="main_page.html";
-    window.open("main_page.html", '_blank').focus();
+    window.open(url, '_blank').focus();
     
     
     /*fetch("/game_page", {

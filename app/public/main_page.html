@@ -11,7 +11,7 @@
   </head>
 
   <body>
-    <div id="newpopup">Hello World</div>
+    <div id="newpopup"></div>
     <div id="popup" class="popup">
       <div class = "wordChoices">
         <button id="choice1" class="choices"></button>
@@ -31,6 +31,8 @@
           <td>Round x of y</td>
           <td>Clue</td>
           <div id = "blanks" class="blanks"></div>
+          <input type="text" id="roomName" placeholder="Enter Room Name" />
+  <button onclick="joinRoom()">Join Room</button>
         </tr>
       </table>
     </div>
@@ -49,23 +51,22 @@
             <tr>
               <td>
                   <canvas id="canvas" width="700" height="700" style="color: white;"></canvas>
-
                   <div class="tools">
                       <button type = "button" class="button"><img src="undo.jpg" width="30" height="30"></button>
                       <button type = "button" class="reset">RESET</button>
           
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: red;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: orange;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: yellow;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: green;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: blue;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: indigo;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: violet;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: black;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: white;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: grey;"></button>
-                      <button onClick="changeColor(this)" type="color" class="color" style="background: brown;"></button>
-                      <input type="range" min="1" max="100" class="range" onInput="changeSize(this.value)" >
+                      <button id = "red" onClick="changeColor(this)" type="color" class="color" style="background: red;"></button>
+                      <button id = "orange" onClick="changeColor(this)" type="color" class="color" style="background: orange;"></button>
+                      <button id = "yellow" onClick="changeColor(this)" type="color" class="color" style="background: yellow;"></button>
+                      <button id = "green" onClick="changeColor(this)" type="color" class="color" style="background: green;"></button>
+                      <button id = "blue" onClick="changeColor(this)" type="color" class="color" style="background: blue;"></button>
+                      <button id = "indigo" onClick="changeColor(this)" type="color" class="color" style="background: indigo;"></button>
+                      <button id = "violet" onClick="changeColor(this)" type="color" class="color" style="background: violet;"></button>
+                      <button id = "black" onClick="changeColor(this)" type="color" class="color" style="background: black;"></button>
+                      <button id = "white" onClick="changeColor(this)" type="color" class="color" style="background: white;"></button>
+                      <button id = "grey" onClick="changeColor(this)" type="color" class="color" style="background: grey;"></button>
+                      <button id = "brown" onClick="changeColor(this)" type="color" class="color" style="background: brown;"></button>
+                      <input id = "width" type="range" min="1" max="100" class="range" onInput="changeSize(this.value)" >
                   </div> 
               </td>
               <td>
