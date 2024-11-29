@@ -1,3 +1,4 @@
+
 body {
     margin: 0px;
     width:fit-content;
@@ -6,7 +7,6 @@ body {
     font-family: "Times New Roman";
     background-image: url("https://i.pinimg.com/564x/d9/52/e9/d952e923fb982e8311989359c4e7f9c0.jpg");
 }
-
 canvas{
     box-shadow: -1px 2px 9px 6px lightseagreen;
     cursor: pointer;
@@ -17,6 +17,10 @@ canvas{
         display: block;
 }
 
+.banner {
+    background-color: lightseagreen;
+    align-items: center;
+}
 .tools {
     display: flex;
     justify-content: center;
@@ -40,10 +44,6 @@ canvas{
     border: 2px solid black;
     cursor: pointer;
     margin: 0 10px;
-}
-.banner {
-    background-color: lightseagreen;
-    align-items: center;
 }
 table.players, table.chat {
     border: 3px solid lightseagreen; 

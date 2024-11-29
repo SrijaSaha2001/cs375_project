@@ -1,70 +1,121 @@
-const socket = io(location.host);
-let roomName = sessionStorage.getItem('roomName');
-console.log("Why: ", roomName)
-if(roomName) {
-    socket.emit('joinRoom', roomName);
-    console.log(socket.id, 'You are in room:', roomName);
-}
-socket.on("connect", () => {
-    console.log(socket.id); // ojIckSD2jqNzOqIrAGzL
-  });
-//socket.on('showPopup', (text) => {
-    //const popup = document.getElementById('newpopup');
-    //popup.textContent = text;
-    //popup.style.display = 'flex';
+const socket = io();
 
-    // Hide the popup after 3 seconds
-    //setTimeout(() => {
-     //   popup.style.display = 'none';
-    //}, 3000);
-//});
-//let chatBoard = document.getElementById("chatBoard");
+const urlParams = new URLSearchParams(window.location.search);
+console.log("url: ", urlParams)
 
-//console.log("Hello")
-/*socket.on('message', (message) => {
-    let new_message = document.createElement('p');
-    new_message.textContent = message;
-    chatBoard.append(new_message);
-})*/
-
-
-let canvas = document.getElementById("canvas");
-let context = canvas.getContext("2d");
+const roomName = urlParams.get('room');
+console.log("room: ", roomName)
+socket.emit('joinRoom', roomName);
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let drawcolor = "black";
+let drawwidth = "5";
+const canvas = document.getElementById('canvas');
+const rect = canvas.getBoundingClientRect();
+const context = canvas.getContext('2d');
+let width = document.getElementById("width")
+width.addEventListener("click", () => {
+    drawwidth = width.value
+})
+let red = document.getElementById("red")
+red.addEventListener("click", () => {
+    drawcolor = "red"
+})
+let orange = document.getElementById("orange")
+orange.addEventListener("click", () => {
+    drawcolor = "orange"
+})
+let yellow = document.getElementById("yellow")
+yellow.addEventListener("click", () => {
+    drawcolor = "yellow"
+})
+let green = document.getElementById("green")
+green.addEventListener("click", () => {
+    drawcolor = "green"
+})
+let blue = document.getElementById("blue")
+blue.addEventListener("click", () => {
+    drawcolor = "blue"
+})
+let indigo = document.getElementById("indigo")
+indigo.addEventListener("click", () => {
+    drawcolor = "indigo"
+})
+let violet = document.getElementById("violet")
+violet.addEventListener("click", () => {
+    drawcolor = "violet"
+})
+let black = document.getElementById("black")
+black.addEventListener("click", () => {
+    drawcolor = "black"
+})
+let white = document.getElementById("white")
+white.addEventListener("click", () => {
+    drawcolor = "white"
+})
+let gray = document.getElementById("grey")
+gray.addEventListener("click", () => {
+    drawcolor = "grey"
+})
+let brown = document.getElementById("brown")
+brown.addEventListener("click", () => {
+    drawcolor = "brown"
+})
 
 let startcol = "white";
 context.fillStyle = startcol;
 context.fillRect(0, 0, canvas.width, canvas.height);
+
 canvas.style.alignSelf = "center";
 
-let drawcolor = "black";
-let drawwidth = "5";
-let drawing = false;
-let lastPosition = { x: 0, y: 0 };
-canvas.addEventListener("touchstart", start, false);
-canvas.addEventListener("touchmove", draw, false);
-canvas.addEventListener("mousedown", start, false);
-canvas.addEventListener("mousemove", draw, false);
-canvas.addEventListener("mouseup", stop, false);
-canvas.addEventListener("touchend", stop, false);
-canvas.addEventListener("mouseout", stop, false);
-socket.on('drawing', (data) => {
-    const { x1, y1, x2, y2, color } = data;
-    context.beginPath();
-    context.moveTo(x1, y1);
-    context.lineTo(x2, y2);
-    context.strokeStyle = color;
-    context.lineWidth = 2;
-    context.stroke();
-    context.closePath();
-});
-socket.on('roomCount', (count) => {
-    alert('Number of sockets in room: ' + count);
-});
-canvas.addEventListener("mouseup", stop, false);
-canvas.addEventListener("touchend", stop, false);
-canvas.addEventListener("mouseout", stop, false);
-//reset.addEventListener("click", clear);
+function joinRoom() {
+    //roomName = document.getElementById('roomName').value;
+    //const socket = io(location.host);
+    //roomName = sessionStorage.getItem('roomName');
+    if (roomName) {
+        console.log("Room name", roomName)
+     socket.emit('joinRoom', roomName); // Join the room
+    }
+}
 
+function draw(e) {
+    if (isDrawing) {
+        context.lineWidth = drawwidth;
+        context.lineCap = 'round';
+        context.strokeStyle = drawcolor;
+        context.lineJoin = "round";
+        context.lineTo(e.clientX, e.clientY);
+        context.stroke();
+        context.beginPath();
+        context.moveTo(e.clientX, e.clientY);
+    } 
+    e.preventDefault();
+}
+function changeColor(element) {
+    drawcolor = element.style.background;
+}
+function changeSize(value) {
+    drawwidth = value;
+}
+function stop(event) {
+    if (isDrawing === true) {
+        context.stroke();
+        context.closePath();
+        isDrawing = false;
+    }
+    event.preventDefault();
+}
+
+canvas.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    lastX = e.offsetX;
+    lastY = e.offsetY;
+    context.lineWidth = drawwidth;
+    context.lineCap = 'round';
+    context.strokeStyle = drawcolor;
+    context.lineJoin = "round";
+});
 let popup = document.getElementById("popup");
 let choice1 = document.getElementById("choice1");
 let choice2 = document.getElementById("choice2");
@@ -125,16 +176,40 @@ choice3.addEventListener("click", () => {
     currentTime = timer.textContent;
     addBlanks(currentChoice)
 });
-socket.emit('sendData', roomName, words);
-socket.on('putValues', (data) => {
-    updateValues(data)
+canvas.addEventListener('mousemove', (e) => {
+    if (isDrawing) {
+        let currentX = e.offsetX;//e.clientX - canvas.offsetLeft;
+        let currentY = e.offsetY;//e.clientY - canvas.offsetTop;
+        drawLine(lastX, lastY, currentX, currentY);
+        socket.emit('drawing', {
+          roomName: roomName,
+          lastX: lastX,
+          lastY: lastY,
+          currentX: currentX,
+          currentY: currentY,
+          drawing: true,
+          color: drawcolor
+        });
+        context.beginPath();
+        context.moveTo(lastX, lastY);
+        context.lineTo(currentX, currentY);
+        context.stroke();
+        lastX = currentX;
+        lastY = currentY;
+      }
+    });
+
+//canvas.addEventListener("mouseup", stop, false);
+canvas.addEventListener('mouseup', () => {
+    isDrawing = false;
+    context.closePath();
+})
+canvas.addEventListener('mouseout', () => {
+    isDrawing = false;
+    context.closePath();
 })
 
-function putValues(data) {
-    choice1.textContent = data["choice1"]
-    choice2.textContent = data["choice2"]
-    choice3.textContent = data["choice3"]
-}
+
 function generateWords(text) {
     var arrayOfWords = text.split(",")
     var num1 = Math.floor(Math.random() * arrayOfWords.length);
@@ -165,52 +240,15 @@ function start(event) {
     event.preventDefault();
 }
 
-function draw(event) {
-    if(drawing === true) {
-        context.lineTo(event.offsetX, 
-            event.offsetY);
-        context.strokeStyle = drawcolor;
-        context.lineWidth = drawwidth;
-        context.lineJoin = "round";
-        context.stroke();
-    }
-    event.preventDefault();
+function drawLine(x1, y1, x2, y2, color) {
+    context.strokeStyle = color;
+    context.beginPath();
+    context.moveTo(x1, y1);
+    context.lineTo(x2, y2);
+    context.stroke();
+    drawcolor = color;
 }
-
-function stop(event) {
-    if (drawing === true) {
-        context.stroke();
-        context.closePath();
-        drawing = false;
-    }
-    event.preventDefault();
-}
-
-function changeColor(element) {
-    drawcolor = element.style.background;
-}
-function changeSize(value) {
-    drawwidth = value;
-}
-
-/*function clear(event) {
-    context.fillStyle = startcol;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-let count = 60;
-/*let timer = document.getElementById("timer")
-  setInterval(function () {
-    count--;
-    timer.textContent = count;
-
-    if(count < 0) {
-        clearInterval(timer);
-    }
-  }, 1000);*/
-
-  let grey = true;
+let grey = true;
 
   function send(event) {
         let log = document.getElementById("logs");
@@ -238,3 +276,9 @@ let count = 60;
         log.append(div);
         input.value = "";
   }
+
+socket.on('drawing', (data) => {
+    if (data.roomName === roomName && data.drawing) {
+        drawLine(data.lastX, data.lastY, data.currentX, data.currentY, data.color);
+    }
+});
