@@ -11,6 +11,8 @@ let lastX = 0;
 let lastY = 0;
 let drawcolor = "black";
 let drawwidth = "5";
+let chatlog = document.getElementById("chatlog")
+//let sendButton = document.getElementById();
 const canvas = document.getElementById('canvas');
 const rect = canvas.getBoundingClientRect();
 const context = canvas.getContext('2d');
@@ -78,7 +80,7 @@ function joinRoom() {
      socket.emit('joinRoom', roomName); // Join the room
     }
 }
-
+let chat = document.getElementById("input")
 function draw(e) {
     if (isDrawing) {
         context.lineWidth = drawwidth;
@@ -122,6 +124,7 @@ let choice2 = document.getElementById("choice2");
 let choice3 = document.getElementById("choice3");
 let currentChoice = ""
 words = {}
+let input = document.getElementById("input").value;
 let timer = document.getElementById("timer");
 let blanks = document.getElementById("blanks");
 let currentTime = timer.textContent;
@@ -248,23 +251,29 @@ function drawLine(x1, y1, x2, y2, color) {
     context.stroke();
     drawcolor = color;
 }
+let content = document.getElementById("input")
 let grey = true;
-
-  function send(event) {
+let sendText = document.getElementById("enterText")
+sendText.addEventListener("click", () => {
+    let chat =  socket.id + ": " + document.getElementById("input").value;
+    socket.emit("updateChat", {roomName: roomName, chat: chat})
+    send(chat)
+})
+  function send(chat) {
         let log = document.getElementById("logs");
-        let input = document.getElementById("input");
-        console.log("why1: ", input.value.toLowerCase())
+        //let input = document.getElementById("input");
+        console.log("why1: ", chat.toLowerCase())
         console.log("why2: ", currentChoice.toLowerCase())
-        if(input.value.trim().toLowerCase() === currentChoice.trim().toLowerCase()) {
+        if(chat.trim().toLowerCase() === currentChoice.trim().toLowerCase()) {
             console.log("why1: ", input.textContent.toLowerCase)
             console.log("why2: ", currentChoice.toLowerCase)
-            blanks.textContent = input.value.trim().toLowerCase()
+            blanks.textContent = chat.trim().toLowerCase()
             generateWords(allWords)
             popup.style.display = "flex"
             timer.textContent = 60;
             currentTime = timer.textContent;
         }
-        inputVal = input.value;
+        inputVal = chat;
         let div = document.createElement("div");
         div.textContent = inputVal;
         if (grey) {
@@ -274,8 +283,15 @@ let grey = true;
           }
         grey = !grey;
         log.append(div);
+        //chatlog
         input.value = "";
   }
+
+  socket.on("updateChat", (data) => {
+    if((data.roomName === roomName) && (data.chat)) {
+        send(data.chat)
+    }
+  })
 
 socket.on('drawing', (data) => {
     if (data.roomName === roomName && data.drawing) {

@@ -25,6 +25,13 @@ io.on('connection', (socket) => {
     socket.to(data.roomName).emit('drawing', data);
   });
 
+  socket.on("updateChat", (data) => {
+    socket.broadcast.to(data.roomName).emit("updateChat", {
+      roomName: data.roomName,
+      chat: data.chat
+    })
+  })
+
   // Disconnect event
   socket.on('disconnect', () => {
     console.log('user disconnected');
