@@ -6,22 +6,36 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Serve static files (for frontend)
 app.use(express.static('public'));
-
-// Handle socket connections
+let previousDrawings = []
+let players = []
+let roomsAndPlayers = {}
 io.on('connection', (socket) => {
-  console.log('a user connected');
 
-  // Join a room
   socket.on('joinRoom', (roomName) => {
-    console.log(`User joined room: ${roomName}`);
     socket.join(roomName);
+    if(!roomsAndPlayers[roomName]) {
+      roomsAndPlayers[roomName] = [];
+    }
+    roomsAndPlayers[roomName].push(socket.id)
+    io.to(roomName).emit('updatePlayers', roomsAndPlayers[roomName])
+    const roomSockets = Array.from(io.sockets.adapter.rooms.get(roomName))
+    console.log(roomSockets)
+    players = roomSockets
+    //socket.emit('currentPlayers', players);
+    players.push(socket.id)
+    //let players = document.getElementById("")
   });
 
-  // Handle drawing events from the clients
+  socket.emit('previousHistory', previousDrawings);
+  socket.on('updateScoreBoard', (data) => {
+    socket.broadcast.to(data.roomName).emit("updateScoreBoard", {
+      roomName: data.roomName,
+      scoreboard: data.scoreboard
+    })
+  })
   socket.on('drawing', (data) => {
-    // Broadcast drawing data to all clients in the same room
+    previousDrawings.push(data)
     socket.to(data.roomName).emit('drawing', data);
   });
 
@@ -30,15 +44,12 @@ io.on('connection', (socket) => {
       roomName: data.roomName,
       chat: data.chat
     })
-  })
+  });
 
-  // Disconnect event
   socket.on('disconnect', () => {
-    console.log('user disconnected');
   });
 });
 
-// Run the server on port 3000
 server.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });

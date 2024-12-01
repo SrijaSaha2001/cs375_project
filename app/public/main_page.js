@@ -6,13 +6,15 @@ console.log("url: ", urlParams)
 const roomName = urlParams.get('room');
 console.log("room: ", roomName)
 socket.emit('joinRoom', roomName);
+let scoreboard = {}
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
 let drawcolor = "black";
 let drawwidth = "5";
+let drawingActions = []
+let chatHistory = []
 let chatlog = document.getElementById("chatlog")
-//let sendButton = document.getElementById();
 const canvas = document.getElementById('canvas');
 const rect = canvas.getBoundingClientRect();
 const context = canvas.getContext('2d');
@@ -70,16 +72,39 @@ context.fillStyle = startcol;
 context.fillRect(0, 0, canvas.width, canvas.height);
 
 canvas.style.alignSelf = "center";
-
+function recordChat(chats) {
+    socket.emit('updateChat', chats)
+    chatHistory.push(chats)
+}
+function updateScoreBoard(players) {
+    let playersList = document.getElementById("mainplayers")
+    playersList.textContent = ""
+    console.log("Here")
+    console.log("Players: ", players)
+    players.forEach((player) => {
+        console.log(player)
+        let row = document.createElement("tr")
+        let column1 = document.createElement("td")
+        let column2 = document.createElement("td")
+        column1.textContent = player
+        column2.textContent = 0
+        row.appendChild(column1)
+        row.appendChild(column2)
+        //row.textContent = player
+        scoreboard[player] = 0
+        console.log(scoreboard)
+        playersList.append(row)
+    })
+}
 function joinRoom() {
-    //roomName = document.getElementById('roomName').value;
-    //const socket = io(location.host);
-    //roomName = sessionStorage.getItem('roomName');
     if (roomName) {
         console.log("Room name", roomName)
-     socket.emit('joinRoom', roomName); // Join the room
+     socket.emit('joinRoom', roomName);
     }
 }
+socket.on('updatePlayers', (players) => {
+    updateScoreBoard(players)
+})
 let chat = document.getElementById("input")
 function draw(e) {
     if (isDrawing) {
@@ -193,6 +218,7 @@ canvas.addEventListener('mousemove', (e) => {
           drawing: true,
           color: drawcolor
         });
+        context.strokeStyle = drawcolor;
         context.beginPath();
         context.moveTo(lastX, lastY);
         context.lineTo(currentX, currentY);
@@ -236,7 +262,8 @@ fetch("words.txt").then((res) =>
    }).catch((e) => 
     console.error(e));
 function start(event) {
-    drawing = true;
+    isDrawing = true;
+    
     context.beginPath();
     context.moveTo(event.offsetX,
                 event.offsetY);
@@ -259,19 +286,27 @@ sendText.addEventListener("click", () => {
     socket.emit("updateChat", {roomName: roomName, chat: chat})
     send(chat)
 })
+
   function send(chat) {
         let log = document.getElementById("logs");
+        console.log("Issue: ", chat)
         //let input = document.getElementById("input");
-        console.log("why1: ", chat.toLowerCase())
-        console.log("why2: ", currentChoice.toLowerCase())
-        if(chat.trim().toLowerCase() === currentChoice.trim().toLowerCase()) {
-            console.log("why1: ", input.textContent.toLowerCase)
-            console.log("why2: ", currentChoice.toLowerCase)
+        //console.log("why1: ", chat.toLowerCase())
+        //console.locd g("why2: ", currentChoice.toLowerCase())
+        
+        if((chat.split(':')[1]) && (chat.split(':')[1].trim().toLowerCase() === currentChoice.trim().toLowerCase())) {
+            //console.log("why1: ", input.textContent.toLowerCase)
+            //console.log("why2: ", currentChoice.toLowerCase)
             blanks.textContent = chat.trim().toLowerCase()
+            scoreboard[socket.id] = scoreboard[socket.id] + 50
+            socket.emit("updateScoreBoard", {roomName: roomName, scoreboard: scoreboard})
             generateWords(allWords)
+            console.log(scoreboard)
+            socket.emit('', )
             popup.style.display = "flex"
             timer.textContent = 60;
             currentTime = timer.textContent;
+            chat = chat.split(':')[0] + " got it right!"
         }
         inputVal = chat;
         let div = document.createElement("div");
@@ -283,7 +318,6 @@ sendText.addEventListener("click", () => {
           }
         grey = !grey;
         log.append(div);
-        //chatlog
         input.value = "";
   }
 
@@ -292,7 +326,39 @@ sendText.addEventListener("click", () => {
         send(data.chat)
     }
   })
+  socket.on("updateScoreBoard", (data) => {
+    if(data.roomName === roomName) {
+        let playersList = document.getElementById("mainplayers")
+    playersList.textContent = ""
 
+    let currentscoreboard = data.scoreboard
+    for (let [player, score] of Object.entries(currentscoreboard)) {
+        console.log(player)
+        console.log("Score: ", score)
+        let row = document.createElement("tr")
+        let column1 = document.createElement("td")
+        let column2 = document.createElement("td")
+        column1.textContent = player
+        column2.textContent = score
+        row.appendChild(column1)
+        row.appendChild(column2)
+        //row.textContent = player
+        scoreboard[player] = score
+        console.log(scoreboard)
+        playersList.append(row)
+    }
+    }
+  })
+
+  socket.on('previousHistory', (actions) => {
+    actions.forEach((action) => {
+        console.log(action)
+        context.beginPath();
+        context.moveTo(action.currentX, action.currentY);
+        context.lineTo(action.lastX, action.lastY);
+        context.stroke();
+    })
+  })
 socket.on('drawing', (data) => {
     if (data.roomName === roomName && data.drawing) {
         drawLine(data.lastX, data.lastY, data.currentX, data.currentY, data.color);
