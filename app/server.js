@@ -6,16 +6,19 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 app.use(express.static('public'));
-
+let roomName = ""
 let roomsAndPlayers = {}
 io.on('connection', (socket) => {
   socket.on('joinRoom', (roomName) => {
     socket.join(roomName);
+    roomName = roomName
     if(!roomsAndPlayers[roomName]) {
       roomsAndPlayers[roomName] = [];
     }
     roomsAndPlayers[roomName].push(socket.id)
     io.to(roomName).emit('updatePlayers', roomsAndPlayers[roomName])
+    let chat = socket.id + " has joined the room!"
+    io.to(roomName).emit("updateChat", {roomName: roomName, chat: chat})
   });
   socket.on('drawing', (data) => {
     socket.to(data.roomName).emit('drawing', data);
