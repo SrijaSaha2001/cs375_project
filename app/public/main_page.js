@@ -1,9 +1,15 @@
 const socket = io();
+
+//gets the room code from the url
 const urlParams = new URLSearchParams(window.location.search);
 const roomName = urlParams.get('room');
+
+//joins the room
 socket.emit('joinRoom', roomName);
+
+//declared variables
 let scoreboard = {}
-let isDrawing = false;
+let drawing = false;
 let lastX = 0;
 let lastY = 0;
 let drawcolor = "black";
@@ -11,9 +17,8 @@ let drawwidth = "5";
 let drawingActions = []
 let chatHistory = []
 let chatlog = document.getElementById("chatlog")
-const canvas = document.getElementById('canvas');
-const rect = canvas.getBoundingClientRect();
-const context = canvas.getContext('2d');
+let canvas = document.getElementById('canvas');
+let context = canvas.getContext('2d');
 let popup = document.getElementById("popup");
 let choice1 = document.getElementById("choice1");
 let choice2 = document.getElementById("choice2");
@@ -31,9 +36,13 @@ let content = document.getElementById("input")
 let grey = true;
 let blankInterval = ""
 let sendText = document.getElementById("enterText")
+
+//getting the current width
 width.addEventListener("click", () => {
     drawwidth = width.value
 })
+
+//getting the current color being used
 let red = document.getElementById("red")
 red.addEventListener("click", () => {
     drawcolor = "red"
@@ -78,16 +87,17 @@ let brown = document.getElementById("brown")
 brown.addEventListener("click", () => {
     drawcolor = "brown"
 })
+
+//variable to guess if a correct guess has been made
 let guessCorrect = false
+
+//setting canvas details
 let startcol = "white";
 context.fillStyle = startcol;
 context.fillRect(0, 0, canvas.width, canvas.height);
-
 canvas.style.alignSelf = "center";
-function recordChat(chats) {
-    socket.emit('updateChat', chats)
-    chatHistory.push(chats)
-}
+
+//function to update the players section with current player ids in the room
 function updateScoreBoard(players) {
     let playersList = document.getElementById("mainplayers")
     playersList.textContent = ""
@@ -107,58 +117,30 @@ function updateScoreBoard(players) {
         playersList.append(row)
     })
 }
-function joinRoom() {
-    if (roomName) {
-        console.log("Room name", roomName)
-     socket.emit('joinRoom', roomName);
-    }
-}
-function draw(e) {
-    if (isDrawing) {
-        context.lineWidth = drawwidth;
-        context.lineCap = 'round';
-        context.strokeStyle = drawcolor;
-        context.lineJoin = "round";
-        context.lineTo(e.clientX, e.clientY);
-        context.stroke();
-        context.beginPath();
-        context.moveTo(e.clientX, e.clientY);
-    } 
-    e.preventDefault();
-}
 function changeColor(element) {
     drawcolor = element.style.background;
 }
 function changeSize(value) {
     drawwidth = value;
 }
-function stop(event) {
-    if (isDrawing === true) {
-        context.stroke();
-        context.closePath();
-        isDrawing = false;
-    }
-    event.preventDefault();
-}
-canvas.addEventListener('mousedown', (e) => {
-    isDrawing = true;
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-    context.lineWidth = drawwidth;
-    context.lineCap = 'round';
-    context.strokeStyle = drawcolor;
-    context.lineJoin = "round";
-});
+
+//interval to get the timer to tick down
 setInterval(function () {
     currentTime--;
     timer.textContent = currentTime;
 }, 1000)
+
+//function to display the words that can be selected from
 function showDiv() {
     popup.style.display = "flex"
 }
+
+//shows the words to be chosen after 3 seconds of loading the screen
 window.onload = function(){
     setTimeout(showDiv, 3000);
 }
+
+//function to create a string with blanks to use as a clue
 function addBlanks(word) {
     let string = ""
     for(let i = 0; i < word.length; i++) {
@@ -172,17 +154,22 @@ function addBlanks(word) {
     blanks.textContent = string;
     blanks.style.display = "flex";
 }
+
+//event listener for the first choice
 choice1.addEventListener("click", () => {
+    //sets the current choice 
     currentChoice = choice1.textContent;
-    console.log("Here1:", choice1.textContent)
-    console.log("Here2:", currentChoice)
     words["choice1"] = choice1.textContent
+    //removes the popup
     popup.style.display = "none"
+    //adjusts the timer based on the length of the word
     timer.textContent = currentChoice.length * 10;
     currentTime = timer.textContent;
     guessCorrect = false
+    //adds the blanks
     addBlanks(currentChoice)
     if(!guessCorrect) {
+        //randomly fills in the blanks with one letter per 10 seconds
         blankInterval = setInterval(function () {
             let currentBlanks = blanks.textContent.split(" ")
             let randomNum = Math.floor(Math.random() * currentChoice.length)
@@ -208,15 +195,22 @@ choice1.addEventListener("click", () => {
         }, 10000)
     }
 });
+
+//event listener for the second choice
 choice2.addEventListener("click", () => {
+    //sets the current choice
     currentChoice = choice2.textContent
     words["choice2"] = choice2.textContent
+    //removes the popup
     popup.style.display = "none"
+    //adjusts the timer based on the length of the word
     timer.textContent = currentChoice.length * 10;
     currentTime = timer.textContent;
     guessCorrect = false
+    //adds the blanks
     addBlanks(currentChoice)
     if(!guessCorrect) {
+        //randomly fills in the blanks with one letter per 10 seconds
         blankInterval = setInterval(function () {
             let currentBlanks = blanks.textContent.split(" ")
             let randomNum = Math.floor(Math.random() * currentChoice.length)
@@ -242,15 +236,22 @@ choice2.addEventListener("click", () => {
         }, 10000)
     }
 });
+
+//event listener for the third choice
 choice3.addEventListener("click", () => {
+    //sets the current choice
     currentChoice = choice3.textContent
     words["choice3"] = choice3.textContent
+    //removes the popup
     popup.style.display = "none"
+    //adjusts the timer based on the length of the word
     timer.textContent = currentChoice.length * 10;
     currentTime = timer.textContent;
     guessCorrect = false
+    //adds the blanks
     addBlanks(currentChoice)
     if(!guessCorrect) {
+        //randomly fills in the blanks with one letter per 10 seconds
         blankInterval = setInterval(function () {
             let currentBlanks = blanks.textContent.split(" ")
             let randomNum = Math.floor(Math.random() * currentChoice.length)
@@ -276,37 +277,77 @@ choice3.addEventListener("click", () => {
         }, 10000)
     }
 });
-canvas.addEventListener('mousemove', (e) => {
-    if (isDrawing) {
-        let currentX = e.offsetX;
-        let currentY = e.offsetY;
-        drawLine(lastX, lastY, currentX, currentY);
+
+
+function start(event) {
+    drawing = true;
+    lastX = event.offsetX;
+    lastY = event.offsetY;
+    context.lineWidth = drawwidth;
+    context.strokeStyle = drawcolor;
+    event.preventDefault()
+}
+
+function draw(x1, y1, x2, y2, color, width) {
+    context.strokeStyle = color;
+    context.lineWidth = width;
+    context.beginPath();
+    context.moveTo(x1, y1);
+    context.lineTo(x2, y2);
+    context.stroke();
+}
+
+function stop(event) {
+    if (drawing === true) {
+        context.stroke();
+        context.closePath();
+        drawing = false;
+    }
+    event.preventDefault();
+}
+
+canvas.addEventListener("touchstart", start, false);
+canvas.addEventListener("touchmove", (event) => {
+    if (drawing) {
+        draw(lastX, lastY, event.offsetX, event.offsetY, drawcolor, drawwidth);
         socket.emit('drawing', {
           roomName: roomName,
           lastX: lastX,
           lastY: lastY,
-          currentX: currentX,
-          currentY: currentY,
+          currentX: event.offsetX,
+          currentY: event.offsetY,
           drawing: true,
-          color: drawcolor
+          color: drawcolor,
+          width: drawwidth
         });
-        context.strokeStyle = drawcolor;
-        context.beginPath();
-        context.moveTo(lastX, lastY);
-        context.lineTo(currentX, currentY);
-        context.stroke();
-        lastX = currentX;
-        lastY = currentY;
+        lastX = event.offsetX;
+        lastY = event.offsetY;
       }
-    });
-canvas.addEventListener('mouseup', () => {
-    isDrawing = false;
-    context.closePath();
-})
-canvas.addEventListener('mouseout', () => {
-    isDrawing = false;
-    context.closePath();
-})
+      event.preventDefault();
+    }, true);
+canvas.addEventListener("touchend", stop, false);
+canvas.addEventListener('mousedown', start, false);
+canvas.addEventListener('mousemove', (event) => {
+    if (drawing) {
+        draw(lastX, lastY, event.offsetX, event.offsetY, drawcolor, drawwidth);
+        socket.emit('drawing', {
+          roomName: roomName,
+          lastX: lastX,
+          lastY: lastY,
+          currentX: event.offsetX,
+          currentY: event.offsetY,
+          drawing: true,
+          color: drawcolor,
+          width: drawwidth
+        });
+        lastX = event.offsetX;
+        lastY = event.offsetY;
+      }
+    }, true);
+canvas.addEventListener('mouseup', stop, false)
+canvas.addEventListener('mouseout', stop, false)
+
+//function to generate words from random list of words
 function generateWords(text) {
     var arrayOfWords = text.split(",")
     var num1 = Math.floor(Math.random() * arrayOfWords.length);
@@ -316,6 +357,8 @@ function generateWords(text) {
     choice2.textContent = arrayOfWords[num2]
     choice3.textContent = arrayOfWords[num3]
 }
+
+//reads all words in a txt file and chooses 3 randoms words for options
 fetch("words.txt").then((res) => 
     res.text()
     ).then((text) => {
@@ -323,28 +366,15 @@ fetch("words.txt").then((res) =>
         generateWords(text)
    }).catch((e) => 
     console.error(e));
-function start(event) {
-    isDrawing = true;
-    
-    context.beginPath();
-    context.moveTo(event.offsetX,
-                event.offsetY);
-    event.preventDefault();
-}
 
-function drawLine(x1, y1, x2, y2, color) {
-    context.strokeStyle = color;
-    context.beginPath();
-    context.moveTo(x1, y1);
-    context.lineTo(x2, y2);
-    context.stroke();
-    drawcolor = color;
-}
+//event listener for sending chats in the chatboard    
 sendText.addEventListener("click", () => {
     let chat =  socket.id + ": " + document.getElementById("input").value;
-    socket.emit("updateChat", {roomName: roomName, chat: chat})
     send(chat)
+    socket.emit("updateChat", {roomName: roomName, chat: chat})
 })
+
+//function to send chat as well as check if the message sent is the right answer
 function send(chat) {
     let log = document.getElementById("logs");       
     if((chat.split(':')[1]) && (chat.split(':')[1].trim().toLowerCase() === currentChoice.trim().toLowerCase())) {
@@ -352,10 +382,7 @@ function send(chat) {
         clearInterval(blankInterval)
         blanks.textContent = chat.split(':')[1].trim().toLowerCase()
         scoreboard[socket.id] = scoreboard[socket.id] + 50
-        socket.emit("updateScoreBoard", {roomName: roomName, scoreboard: scoreboard})
         generateWords(allWords)
-        console.log(scoreboard)
-        socket.emit('', )
         popup.style.display = "flex"
         timer.textContent = 60;
         currentTime = timer.textContent;
@@ -375,46 +402,13 @@ function send(chat) {
 }
 
 socket.on("updateChat", (data) => {
-    if((data.roomName === roomName) && (data.chat)) {
-        send(data.chat)
-    }
+    send(data.chat)
 })
+
 socket.on('updatePlayers', (players) => {
     updateScoreBoard(players)
 })
-socket.on("updateScoreBoard", (data) => {
-    if(data.roomName === roomName) {
-        let playersList = document.getElementById("mainplayers")
-    playersList.textContent = ""
 
-    let currentscoreboard = data.scoreboard
-    for (let [player, score] of Object.entries(currentscoreboard)) {
-        console.log(player)
-        console.log("Score: ", score)
-        let row = document.createElement("tr")
-        let column1 = document.createElement("td")
-        let column2 = document.createElement("td")
-        column1.textContent = player
-        column2.textContent = score
-        row.appendChild(column1)
-        row.appendChild(column2)
-        scoreboard[player] = score
-        console.log(scoreboard)
-        playersList.append(row)
-    }
-}
-})
-socket.on('previousHistory', (actions) => {
-    actions.forEach((action) => {
-        console.log(action)
-        context.beginPath();
-        context.moveTo(action.currentX, action.currentY);
-        context.lineTo(action.lastX, action.lastY);
-        context.stroke();
-    })
-})
 socket.on('drawing', (data) => {
-    if (data.roomName === roomName && data.drawing) {
-        drawLine(data.lastX, data.lastY, data.currentX, data.currentY, data.color);
-    }
+    draw(data.lastX, data.lastY, data.currentX, data.currentY, data.color, data.width);
 });

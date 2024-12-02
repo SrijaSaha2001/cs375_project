@@ -1,6 +1,5 @@
 let socket = io();
 
-
 let button = document.getElementById("join");
 
 button.addEventListener("click", () => {
@@ -10,26 +9,5 @@ button.addEventListener("click", () => {
     socket.emit('joinRoom', roomName)
     console.log("Client")
     let url = 'main_page.html?room=' + roomName
-    //window.location.href="main_page.html";
     window.open(url, '_blank').focus();
-    
-    
-    /*fetch("/game_page", {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json"
-        },
-        body: JSON.stringify({room: roomName.value}),
-    }).then(response => {
-        let message = document.getElementById("message")
-        if(response.status === 200) {
-            message.textContent = "Success"
-        }
-        else {
-            message.textContent = "Bad request"
-        }
-        window.location.href="lobby_page.html";
-    }).catch(error => {
-        console.log(error);
-    });*/
 })
