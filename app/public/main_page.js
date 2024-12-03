@@ -27,15 +27,17 @@ let currentChoice = ""
 let words = {}
 let allWords = ""
 let input = document.getElementById("input").value;
-let chat = document.getElementById("input")
+let chat = document.getElementById("input");
 let timer = document.getElementById("timer");
 let blanks = document.getElementById("blanks");
 let currentTime = timer.textContent;
-let width = document.getElementById("width")
-let content = document.getElementById("input")
+let width = document.getElementById("width");
+let content = document.getElementById("input");
 let grey = true;
 let blankInterval = ""
 let sendText = document.getElementById("enterText")
+let restore = [];
+let index = -1;
 
 //getting the current width
 width.addEventListener("click", () => {
@@ -132,8 +134,11 @@ setInterval(function () {
 
 //function to display the words that can be selected from
 function showDiv() {
-    popup.style.display = "flex"
+    if (role === "drawer"){
+        popup.style.display = "flex"
+    }
 }
+    
 
 //shows the words to be chosen after 3 seconds of loading the screen
 window.onload = function(){
@@ -277,7 +282,19 @@ choice3.addEventListener("click", () => {
         }, 10000)
     }
 });
-
+//to assign roles and loop through players
+function assignrole(players) {
+    for(let i = 0; i < players.length; i++) {
+        setTimeout(() => {
+            if (socket.id === players[i]) {
+            let role = "drawer";
+            }
+            else {
+            role = "guesser";
+            }
+        }, (timer.textContent*1000));
+    }
+}
 
 function start(event) {
     drawing = true;
@@ -304,6 +321,29 @@ function stop(event) {
         drawing = false;
     }
     event.preventDefault();
+    if(event.type != 'mouseout') {
+        restore.push(context.getImageData(0, 0, canvas.width, canvas.height));
+        index += 1;
+    }
+}
+
+function clear() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = startcol;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    restore = [];
+    index = -1;
+}
+
+function undo() {
+    if (index <= 0) {
+        clear();
+    }
+    else {
+        index-= 1;
+        restore.pop();
+        context.putImageData(restore[index], 0, 0);
+    }
 }
 
 canvas.addEventListener("touchstart", start, false);
@@ -388,7 +428,7 @@ function send(chat) {
         currentTime = timer.textContent;
         chat = chat.split(':')[0] + " got it right!"
     }
-    inputVal = chat;
+    let inputVal = chat;
     let div = document.createElement("div");
     div.textContent = inputVal;
     if (grey) {
@@ -398,11 +438,15 @@ function send(chat) {
     }
     grey = !grey;
     log.append(div);
-    input.value = "";
+    chat.value = " ";
 }
 
+
 socket.on("updateChat", (data) => {
-    send(data.chat)
+    if (role === "guesser") {
+        send();
+    }
+    
 })
 
 socket.on('updatePlayers', (players) => {
@@ -410,5 +454,7 @@ socket.on('updatePlayers', (players) => {
 })
 
 socket.on('drawing', (data) => {
-    draw(data.lastX, data.lastY, data.currentX, data.currentY, data.color, data.width);
+    if (role === "drawer"){
+        draw(data.lastX, data.lastY, data.currentX, data.currentY, data.color, data.width);
+    }
 });
