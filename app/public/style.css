@@ -139,7 +139,8 @@ button.join {
     align-items: center;
     background-color: rgb(176, 200, 221);
     width: 40%;
-    height: 40%
+    height: 40%;
+    z-index: 0;
 }
 
 .choices {
@@ -154,19 +155,20 @@ button.join {
 .choices:hover {
     background-color: #033254;
 }
-.newpopup {
+.starterPopup {
+    display: flex;
+    top: 0;
     position:absolute;
-    top: 20px;
-    left: 50%;
     margin-top: 40%;
-    margin-left: 35%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 10px;
-    display: none;
-    width: 40%;
-    height: 40%
+    margin-left: 32%;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(113, 148, 202);
+    width: 50%;
+    height: 50%;
+    z-index: 1;
+    font-size: 35px;
+    font-weight: bold;
 }
 .blanks {
     position: absolute;
