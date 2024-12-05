@@ -56,6 +56,7 @@ io.on('connection', (socket) => {
     for(let i = 0; i < currentPlayers.length; i++) {
       if(!pastDrawers.includes(currentPlayers[i])) {
         drawer = currentPlayers[i];
+        roomsAndDrawers[data.roomName].push(drawer)
       }
     }
     io.to(data.roomName).emit("DrawerChosen", {socket_id: drawer})
