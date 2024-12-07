@@ -28,7 +28,23 @@ create.addEventListener("click", () => {
 // join with room code 
 join.addEventListener("click", () => {
     let roomName = document.getElementById("roomName").value;
-    console.log(roomName)
+    console.log(roomName) // TESTING
+    socket.emit("roomExists", roomName); // check if room exists
+
+    /* !! This part was moved to the below function when the room exists !!
+    sessionStorage.setItem('roomName', roomName)
+    socket.emit('joinRoom', roomName)
+    console.log("Client")
+    //let url = 'main_page.html?room=' + roomName
+    let url = 'http://localhost:3000/main_page.html?room=' + roomName;
+    //window.open(url, '_blank').focus();
+    window.location.href = url; */
+})
+
+socket.on('roomExists', (roomName) => {
+    // TESTING
+    console.log("Room [", roomName, "] exists!");
+
     sessionStorage.setItem('roomName', roomName)
     socket.emit('joinRoom', roomName)
     console.log("Client")
@@ -36,4 +52,11 @@ join.addEventListener("click", () => {
     let url = 'http://localhost:3000/main_page.html?room=' + roomName;
     //window.open(url, '_blank').focus();
     window.location.href = url;
-})
+});
+
+socket.on('roomInvalid', (roomName) => {
+    // pop up saying the room doesn't exist
+
+    // TESTING
+    console.log("Room [", roomName, "] doesn't exist!");
+});

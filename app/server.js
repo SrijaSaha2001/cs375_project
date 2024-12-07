@@ -24,6 +24,21 @@ io.on('connection', (socket) => {
     roomsAndPlayers[roomCode].push(socket.id);
     io.to(roomCode).emit('newRoom', {roomCode: roomCode, id: socket.id})
   });
+  socket.on('roomExists', (roomName) => {
+    // TESTING
+    console.log("KEYS: ", Object.keys(roomsAndPlayers));
+
+    // Validate room code exists
+    let currentRooms = Object.keys(roomsAndPlayers);
+    if(currentRooms.includes(roomName)) {
+      socket.emit("roomExists", roomName);
+    }
+    else {
+      // TESTING
+      console.log("Room code [", roomName, "] doesn't exist!");
+      socket.emit("roomInvalid", roomName);
+    }
+  });
   socket.on('joinRoom', (roomName) => {
     socket.join(roomName);
     if(!roomsAndPlayers[roomName]) {
