@@ -454,6 +454,7 @@ function send(chat) {
 }
 
 socket.on("updateChat", (data) => {
+    console.log(data.roomName);
         send(data.chat);
 })
 socket.on("updateChoice", (data) => {
@@ -474,6 +475,8 @@ socket.on('drawing', (data) => {
 });
 
 socket.on("updateStarterTimer", (data) => {
+    //console.log("room: ", data.roomName);
+    //console.log(data.startingTimer);
     if(data.startingTimer !== 0) {
         starterTime = data.startingTimer
         let timer = document.getElementById("starterPopup")

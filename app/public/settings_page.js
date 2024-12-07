@@ -1,3 +1,5 @@
+const socket = io();
+
 let numPlayers = document.getElementById("players").value;
 let drawTime = document.getElementById("drawtime").value;
 let numRounds = document.getElementById("rounds").value;
@@ -16,4 +18,10 @@ roomCode.addEventListener("click", function(event) {
     var copyCode = roomCode.textContent;
     navigator.clipboard.writeText(copyCode);
     console.log("Copied the text: " + copyCode);
+});
+
+socket.on("newRoom", (data) => {
+    roomCode.textContent = data.roomCode;
+    console.log("CODE: ", data.roomCode);
+    console.log("ID: ", data.id);
 });

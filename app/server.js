@@ -13,18 +13,33 @@ let roomsAndRounds = {}
 let roomsAndDrawers = {}
 let interval = undefined
 io.on('connection', (socket) => {
+  socket.on('createRoom', (roomCode) => {
+    socket.join(roomCode);
+    if(!roomsAndPlayers[roomCode]) {
+      console.log(socket.id);
+      roomsAndPlayers[roomCode] = [];
+      roomsAndDrawers[roomCode] = [];
+      roomsAndTimers[roomCode] = 15;
+    }
+    roomsAndPlayers[roomCode].push(socket.id);
+    io.to(roomCode).emit('newRoom', {roomCode: roomCode, id: socket.id})
+  });
   socket.on('joinRoom', (roomName) => {
     socket.join(roomName);
     if(!roomsAndPlayers[roomName]) {
+      console.log("TEST 1:", socket.id); // TESTING
+      console.log("ROOM: ", roomName);
       roomsAndPlayers[roomName] = [];
       roomsAndDrawers[roomName] = [];
       roomsAndTimers[roomName] = 15;
-      socket.to(roomName).emit('updateStarterTimer', {roomName: roomName, startingTimer: timer})
+      io.to(roomName).emit("updateStarterTimer", {roomName: roomName, startingTimer: timer})
     }
     socket.on('updateTimer', (data) => {
       io.to(data.roomName).emit('updateTimer',{roomName: roomName, timer: timer})
     })
     roomsAndPlayers[roomName].push(socket.id)
+    console.log("TEST 2:", socket.id); // TESTING
+    console.log(roomsAndPlayers[roomName]); // TESTING
     io.to(roomName).emit('updatePlayers', roomsAndPlayers[roomName])
     let chat = socket.id + " has joined the room!"
     io.to(roomName).emit("updateChat", {roomName: roomName, chat: chat})
@@ -36,7 +51,7 @@ io.on('connection', (socket) => {
     for (const [roomName, timer] of Object.entries(roomsAndTimers)) {
       roomsAndTimers[roomName] = timer - 1;
       if(roomsAndTimers[roomName] >= 0) {
-        io.to(roomName).emit("updateStarterTimer", {startingTimer: roomsAndTimers[roomName]})
+        io.to(roomName).emit("updateStarterTimer", {roomName: roomName, startingTimer: roomsAndTimers[roomName]})
       }
     }
   }, 1000)
