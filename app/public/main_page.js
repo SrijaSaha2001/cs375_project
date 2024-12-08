@@ -5,11 +5,17 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 let username = urlParams.get('username'); // get username from URL
 let roomCode = urlParams.get('room'); // get room code from URL
-console.log("Username: ", username, " - Room: ", roomCode);
+//console.log("Username: ", username, " - Room: ", roomCode); // TESTING
+let socketID = undefined; // temporary
 
 // Updates username's associated socket id after redirection
 //socket.emit('redirected', roomCode, username);
 socket.emit('joinRoom', roomCode, username);
+socket.emit('getSocketId', roomCode, username);
+socket.on('returnSocketId', (socket_id) => {
+    socketID = socket_id;
+    // console.log("SOCKET ID: ", socketID);
+})
 
 //declared variables
 let scoreboard = {}
@@ -107,8 +113,8 @@ canvas.style.alignSelf = "center";
 function updateScoreBoard(players) {
     let playersList = document.getElementById("mainplayers")
     playersList.textContent = ""
-    console.log("Here")
-    console.log("Players: ", players)
+    //console.log("Here")
+    //console.log("Players: ", players)
     players.forEach((player) => {
         console.log(player)
         let row = document.createElement("tr")
@@ -119,7 +125,7 @@ function updateScoreBoard(players) {
         row.appendChild(column1)
         row.appendChild(column2)
         scoreboard[player] = 0
-        console.log(scoreboard)
+        //console.log(scoreboard)
         playersList.append(row)
     })
 }
@@ -129,6 +135,9 @@ function changeColor(element) {
 function changeSize(value) {
     drawwidth = value;
 }
+
+// Being countdown of 15 seconds before starting game and choosing roles
+socket.emit('beginCountdown', roomCode, socketID);
 
 //interval to get the timer to tick down
 setInterval(function () {
@@ -479,14 +488,12 @@ socket.on('drawing', (data) => {
 });
 
 socket.on("updateStarterTimer", (data) => {
-    //console.log("room: ", data.roomCode);
-    //console.log(data.startingTimer);
     if(data.startingTimer !== 0) {
         starterTime = data.startingTimer
         let timer = document.getElementById("starterPopup")
         timer.textContent = "Game starting in: " + starterTime;
-        socket.emit("updateStarterTimer", {roomCode: roomCode, startingTimer: starterTime})
-        starterTime--;
+        //socket.emit("updateStarterTimer", {roomCode: roomCode, startingTimer: starterTime})
+        //starterTime--;
     }
     else {
         let timer = document.getElementById("starterPopup");
@@ -495,13 +502,12 @@ socket.on("updateStarterTimer", (data) => {
     }
 })
 socket.on("DrawerChosen", (socket_id, username) => {
-    console.log(socket.id);
     if(socket_id === socket.id) {
-        console.log("EQUALS")
+        //console.log("EQUALS")
         popup.style.display = "flex"
     }
     else {
-        console.log("NOT EQUALS")
+        //console.log("NOT EQUALS")
         popup.style.display = "none"
         let timer = document.getElementById("starterPopup")
         timer.textContent = username + " is choosing!"

@@ -6,14 +6,16 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 app.use(express.static('public'));
-let timer = 0
+let timer = 15 // default countdown before game starts
 let roomsAndPlayers = {} // maps room code to socket ids
 let roomsAndUsernames = {} // maps room code to usernames
 let roomsAndTimers = {}
 let roomsAndRounds = {}
 let roomsAndDrawers = {}
-let usernamesAndIds = {} // maps usernames to socket ids
+let roomsUsersIds = {} // maps rooms to usernames and latest socket ids
+let roomsAndSettings = {} // maps rooms to settings (drawTime, numRounds)
 let interval = undefined
+let roomsAndCreators = {} // maps rooms with room creator's socket id
 
 io.on('connection', (socket) => {
   // CREATE NEW ROOM
@@ -21,10 +23,13 @@ io.on('connection', (socket) => {
     socket.join(roomCode);
     if(!roomsAndPlayers[roomCode]) {
       console.log("Room Creator: ", socket.id); // TESTING
+      roomsAndCreators[roomCode] = username; // keep track of creator
       roomsAndPlayers[roomCode] = [];
       roomsAndDrawers[roomCode] = [];
       roomsAndUsernames[roomCode] = [];
       roomsAndTimers[roomCode] = 15;
+      roomsUsersIds[roomCode] = {};
+      roomsAndSettings[roomCode] = {}; // keeps track of settings
     }
     roomsAndPlayers[roomCode].push(socket.id);
   });
@@ -49,13 +54,18 @@ io.on('connection', (socket) => {
     socket.join(roomName);
 
     // Checks if username has been seen before -- prevents duplicate entries upon redirection  
-    let names = Object.keys(usernamesAndIds);
+    //let names = Object.keys(usernamesAndIds);
+    let names = Object.keys(roomsUsersIds[roomName]);
+    //console.log("Names: ", names);
     if(!names.includes(username)) {
-      console.log("Pushing user [", username, "] to room [", roomName, "]");
+      //console.log("Pushing user [", username, "] to room [", roomName, "]");
       roomsAndUsernames[roomName].push(username); // maps room code to username
     }
-    usernamesAndIds[username] = socket.id; // add/update username with current socket id
-    
+    //usernamesAndIds[username] = socket.id; // add/update username with current socket id
+    roomsUsersIds[roomName][username] = socket.id
+    //console.log("Usernames + IDs: ", usernamesAndIds[roomName]);
+    //console.log("Rooms and usernames: ", roomsUsersIds[roomName]);
+
     // Get sockets in room
     // let temp = io.sockets.adapter.rooms.get(roomName);
     //console.log("Current connections: ", temp); // TESTING
@@ -83,24 +93,48 @@ io.on('connection', (socket) => {
     */
   });
   // Start game when room creator presses "start game" button in settings page
-  socket.on('startGame', (roomCode) => {
+  socket.on('startGame', (roomCode, drawTime, numRounds) => {
+    // Log room settings to determine draw time and number of rounds later
+    roomsAndSettings[roomCode]['drawTime'] = drawTime;
+    roomsAndSettings[roomCode]['numRounds'] = numRounds;
+    // console.log("SETTINGS: ", roomsAndSettings[roomCode]); // TESTING
     io.to(roomCode).emit('start', roomCode); // redirects everyone to the main page
-    io.to(roomCode).emit("updateStarterTimer", {roomName: roomCode, startingTimer: 15})
-    socket.on('updateTimer', (data) => {
-      io.to(roomCode).emit('updateTimer',{roomName: roomCode, timer: timer})
-    })
+    //io.to(roomCode).emit("updateStarterTimer", {roomName: roomCode, startingTimer: 15})
   });
-  if(interval) {
+  socket.on('beginCountdown', (roomCode, username) => {
+    // Ensures countdown is triggered once by the room creator to avoid problems
+    let creatorUsername = roomsAndCreators[roomCode];
+    let creatorId = roomsUsersIds[roomCode][creatorUsername];
+    //console.log("Creator ID: ", creatorId, " --- Passed ID: ", socket.id); // TESTING
+    // Only proceed with countdown upon matching creator's socket id
+    if(creatorId == socket.id) {
+      let seconds = 15;
+      let countdown = setInterval(function () {
+        if(seconds < 0) {
+          //console.log("Clearing interval")
+          clearInterval(countdown); 
+        }
+        else {
+          io.to(roomCode).emit("updateStarterTimer", {roomName: roomCode, startingTimer: seconds});
+          seconds--;
+        }
+      }, 1000);
+    }
+  })
+  /*if(interval) {
     clearInterval(interval)
   }
   interval = setInterval(function () {
     for (const [roomName, timer] of Object.entries(roomsAndTimers)) {
+      //console.log("TIMER 1: ", timer); // TESTING
       roomsAndTimers[roomName] = timer - 1;
+      //console.log("TIMER 2: ", timer); // TESTING
       if(roomsAndTimers[roomName] >= 0) {
+        //console.log("UPDATING START TIMER"); // TESTING
         io.to(roomName).emit("updateStarterTimer", {roomName: roomName, startingTimer: roomsAndTimers[roomName]})
       }
     }
-  }, 1000)
+  }, 1000) */
   socket.on('drawing', (data) => {
     socket.to(data.roomName).emit('drawing', data);
   });
@@ -122,7 +156,7 @@ io.on('connection', (socket) => {
         //roomsAndDrawers[roomCode].push(drawer)
       }
     }
-    let drawerUsername = Object.keys(usernamesAndIds).find(key => usernamesAndIds[key] === drawer); // get username from socket id
+    let drawerUsername = Object.keys(roomsUsersIds[roomCode]).find(key => roomsUsersIds[roomCode][key] === drawer); // get username from socket id
     // console.log(drawerUsername); // TESTING
     io.to(roomCode).emit("DrawerChosen", drawer, drawerUsername) // sends socket id and username to display on screens
   });
@@ -131,6 +165,11 @@ io.on('connection', (socket) => {
   })
   socket.on('disconnect', () => {
   });
+  socket.on('getSocketId', (roomCode, username) => {
+    let socket_id = roomsUsersIds[roomCode][username];
+    //console.log("!!! SOCKET ID: ", socket_id);
+    socket.emit('returnSocketId', socket_id);
+  })
 });
 
 server.listen(3000, () => {
