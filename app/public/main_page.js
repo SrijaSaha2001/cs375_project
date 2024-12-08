@@ -1,11 +1,15 @@
 const socket = io();
 
-//gets the room code from the url
-const urlParams = new URLSearchParams(window.location.search);
-const roomName = urlParams.get('room');
+// Gets username and room code from URL
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+let username = urlParams.get('username'); // get username from URL
+let roomCode = urlParams.get('room'); // get room code from URL
+console.log("Username: ", username, " - Room: ", roomCode);
 
-//joins the room
-socket.emit('joinRoom', roomName);
+// Updates username's associated socket id after redirection
+//socket.emit('redirected', roomCode, username);
+socket.emit('joinRoom', roomCode, username);
 
 //declared variables
 let scoreboard = {}
@@ -165,7 +169,7 @@ choice1.addEventListener("click", () => {
     let choosingPopup = document.getElementById("starterPopup")
     choosingPopup.style.display = "none";
     currentChoice = choice1.textContent;
-    socket.emit('updateChoice', {roomName: roomName, choice: currentChoice})
+    socket.emit('updateChoice', {roomCode: roomCode, choice: currentChoice})
     words["choice1"] = choice1.textContent
     //removes the popup
     popup.style.display = "none"
@@ -199,7 +203,7 @@ choice1.addEventListener("click", () => {
                 }
             }
             blanks.textContent = newBlanks
-            socket.emit("updateBlanks", {roomName: roomName, blanks: newBlanks})
+            socket.emit("updateBlanks", {roomCode: roomCode, blanks: newBlanks})
         }, 10000)
     }
 });
@@ -210,7 +214,7 @@ choice2.addEventListener("click", () => {
     let choosingPopup = document.getElementById("starterPopup")
     choosingPopup.style.display = "none";
     currentChoice = choice2.textContent
-    socket.emit('updateChoice', {roomName: roomName, choice: currentChoice})
+    socket.emit('updateChoice', {roomCode: roomCode, choice: currentChoice})
     words["choice2"] = choice2.textContent
     //removes the popup
     popup.style.display = "none"
@@ -244,7 +248,7 @@ choice2.addEventListener("click", () => {
                 }
             }
             blanks.textContent = newBlanks
-            socket.emit("updateBlanks", {roomName: roomName, blanks: newBlanks})
+            socket.emit("updateBlanks", {roomCode: roomCode, blanks: newBlanks})
         }, 10000)
     }
 });
@@ -255,13 +259,13 @@ choice3.addEventListener("click", () => {
     let choosingPopup = document.getElementById("starterPopup")
     choosingPopup.style.display = "none";
     currentChoice = choice3.textContent
-    socket.emit('updateChoice', {roomName: roomName, choice: currentChoice})
+    socket.emit('updateChoice', {roomCode: roomCode, choice: currentChoice})
     words["choice3"] = choice3.textContent
     //removes the popup
     popup.style.display = "none"
     //adjusts the timer based on the length of the word
     timer.textContent = currentChoice.length * 10;
-    socket.emit("updateTimer", {roomName: roomName, timer: timer.textContent})
+    socket.emit("updateTimer", {roomCode: roomCode, timer: timer.textContent})
     currentTime = timer.textContent;
     guessCorrect = false
     //adds the blanks
@@ -290,7 +294,7 @@ choice3.addEventListener("click", () => {
                 }
             }
             blanks.textContent = newBlanks
-            socket.emit("updateBlanks", {roomName: roomName, blanks: newBlanks})
+            socket.emit("updateBlanks", {roomCode: roomCode, blanks: newBlanks})
         }, 10000)
     }
 });
@@ -363,7 +367,7 @@ canvas.addEventListener("touchmove", (event) => {
     if (drawing) {
         draw(lastX, lastY, event.offsetX, event.offsetY, drawcolor, drawwidth);
         socket.emit('drawing', {
-          roomName: roomName,
+          roomCode: roomCode,
           lastX: lastX,
           lastY: lastY,
           currentX: event.offsetX,
@@ -383,7 +387,7 @@ canvas.addEventListener('mousemove', (event) => {
     if (drawing) {
         draw(lastX, lastY, event.offsetX, event.offsetY, drawcolor, drawwidth);
         socket.emit('drawing', {
-          roomName: roomName,
+          roomCode: roomCode,
           lastX: lastX,
           lastY: lastY,
           currentX: event.offsetX,
@@ -423,7 +427,7 @@ fetch("words.txt").then((res) =>
 sendText.addEventListener("click", () => {
     let chat =  socket.id + ": " + document.getElementById("input").value;
     send(chat)
-    socket.emit("updateChat", {roomName: roomName, chat: chat})
+    socket.emit("updateChat", {roomCode: roomCode, chat: chat})
 })
 
 //function to send chat as well as check if the message sent is the right answer
@@ -454,7 +458,7 @@ function send(chat) {
 }
 
 socket.on("updateChat", (data) => {
-    console.log(data.roomName);
+    console.log(data.roomCode);
         send(data.chat);
 })
 socket.on("updateChoice", (data) => {
@@ -475,29 +479,32 @@ socket.on('drawing', (data) => {
 });
 
 socket.on("updateStarterTimer", (data) => {
-    //console.log("room: ", data.roomName);
+    //console.log("room: ", data.roomCode);
     //console.log(data.startingTimer);
     if(data.startingTimer !== 0) {
         starterTime = data.startingTimer
         let timer = document.getElementById("starterPopup")
         timer.textContent = "Game starting in: " + starterTime;
-        socket.emit("updateStarterTimer", {roomName: roomName, startingTimer: starterTime})
+        socket.emit("updateStarterTimer", {roomCode: roomCode, startingTimer: starterTime})
         starterTime--;
     }
     else {
         let timer = document.getElementById("starterPopup");
         timer.style.display = "none"
-        socket.emit("chooseDrawer", {roomName: roomName})
+        socket.emit("chooseDrawer", roomCode)
     }
 })
-socket.on("DrawerChosen", (data) => {
-    if(data.socket_id === socket.id) {
+socket.on("DrawerChosen", (socket_id, username) => {
+    console.log(socket.id);
+    if(socket_id === socket.id) {
+        console.log("EQUALS")
         popup.style.display = "flex"
     }
     else {
+        console.log("NOT EQUALS")
         popup.style.display = "none"
         let timer = document.getElementById("starterPopup")
-        timer.textContent = data.socket_id + "is choosing!"
+        timer.textContent = username + " is choosing!"
         timer.style.display = "flex"
     }
 })
