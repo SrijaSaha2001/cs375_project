@@ -178,3 +178,11 @@ button.join {
     display: flex;
     font-size: 30px;
 }
+
+#restart {
+    height: 100px;
+    width: 500px;
+    background-color: limegreen;
+    font-size: 20px;
+    align-items: center;
+}
