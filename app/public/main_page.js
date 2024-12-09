@@ -400,7 +400,14 @@ function undo() {
         restore.pop();
         context.putImageData(restore[index], 0, 0);
     }
+    ///socket.emit("undo", roomCode);
 }
+
+/*let undobutt = document.getElementsByClassName("button");
+undobutt.addEventListener("click", () => {
+    undo();
+    socket.emit("undo", {roomCode: roomCode});
+});*/
 
 canvas.addEventListener("touchstart", start, false);
 canvas.addEventListener("touchmove", (event) => {
@@ -473,6 +480,8 @@ sendText.addEventListener("click", () => {
         socket.emit("updateChat", {roomCode: roomCode, chat: chat})
     }
 })
+
+
 
 //function to send chat as well as check if the message sent is the right answer
 function send(chat) {
@@ -608,3 +617,7 @@ socket.on('clearPopup', (drawerId) => {
 socket.on('updateDrawTime', (drawTime) => {
     timer.textContent = drawTime;
 });
+
+/*socket.on("undo", (roomCode)=> {
+    undo();
+});*/
