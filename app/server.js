@@ -152,6 +152,7 @@ io.on('connection', (socket) => {
   socket.on("updateChat", (data) => {
     socket.to(data.roomCode).emit("updateChat", {roomCode: data.roomCode, chat: data.chat})
   });
+  
   socket.on("chooseDrawer", (roomCode) => {
     let creatorUsername = roomsAndCreators[roomCode];
     let creatorId = roomsUsersIds[roomCode][creatorUsername];
@@ -250,7 +251,11 @@ io.on('connection', (socket) => {
         }
       }
   });
+ /* socket.on("undo", (roomCode)=> {
+    io.to(roomCode).emit("undo");
+  });*/
 });
+
 
 server.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
