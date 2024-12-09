@@ -19,6 +19,7 @@ let roomsAndIntervals = {} // maps room to current draw time interval to clear w
 let roomsAndTurns = {} // maps room to current number of drawing turns per round
 let interval = undefined
 let roomsAndCreators = {} // maps rooms with room creator's socket id
+let roomsUsersPts = {};
 
 io.on('connection', (socket) => {
   // CREATE NEW ROOM
@@ -37,6 +38,7 @@ io.on('connection', (socket) => {
       roomsAndGuesses[roomCode] = 0;
       roomsAndCorrectGuessers = [];
       roomsAndTurns[roomCode] = 0;
+      roomsUsersPts[roomCode] = {username : 0};
     }
     roomsAndPlayers[roomCode].push(socket.id);
   });
@@ -219,6 +221,7 @@ io.on('connection', (socket) => {
       let numRounds = roomsAndSettings[roomCode]['numRounds'];
       if(round == numRounds) {
         io.to(roomCode).emit('endGame', roomCode); // end game after all rounds finish
+        io.to(roomCode).emit("finalScore", {roomCode : roomCode, scores : roomsUsersPts});
       }
       else {
         roomsAndRounds[roomCode]++;
@@ -232,6 +235,7 @@ io.on('connection', (socket) => {
     //let currentUsername = Object.keys(roomsUsersIds[roomCode]).find(key => roomsUsersIds[roomCode][key] === socket_id);
     //console.log("current username: ", currentUsername, " -- user from chat: ", username);
       io.to(roomCode).emit('updateScore', username, 50);
+      roomsUsersPts[roomCode][username] += 50;
       console.log("CORRECT GUESS")
       roomsAndGuesses[roomCode]++;
       let count = roomsAndGuesses[roomCode]; // current number of correct guesses
