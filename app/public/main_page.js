@@ -49,6 +49,8 @@ let sendText = document.getElementById("enterText")
 let restore = [];
 let index = -1;
 let starterTime = 15;
+let undoButton = document.getElementById("undo");
+let clearButton = document.getElementById("clear");
 
 let currentDrawer = undefined; // socket id of current drawer
 
@@ -393,9 +395,11 @@ function clear() {
 
 function undo() {
     if (index <= 0) {
+        console.log('cleared');
         clear();
     }
     else {
+        console.log("else")
         index-= 1;
         restore.pop();
         context.putImageData(restore[index], 0, 0);
@@ -403,11 +407,16 @@ function undo() {
     ///socket.emit("undo", roomCode);
 }
 
-/*let undobutt = document.getElementsByClassName("button");
-undobutt.addEventListener("click", () => {
+
+undoButton.addEventListener("click", () => {
     undo();
-    socket.emit("undo", {roomCode: roomCode});
-});*/
+    socket.emit("undo", roomCode);
+});
+
+clearButton.addEventListener("click", () => {
+    clear();
+    socket.emit("clear", roomCode); 
+})
 
 canvas.addEventListener("touchstart", start, false);
 canvas.addEventListener("touchmove", (event) => {
@@ -618,6 +627,10 @@ socket.on('updateDrawTime', (drawTime) => {
     timer.textContent = drawTime;
 });
 
-/*socket.on("undo", (roomCode)=> {
+socket.on("undo", (roomCode) => {
     undo();
-});*/
+});
+
+socket.on("clear", (roomCode) => {
+    clear();
+})

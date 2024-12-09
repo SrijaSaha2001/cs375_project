@@ -255,9 +255,12 @@ io.on('connection', (socket) => {
         }
       }
   });
- /* socket.on("undo", (roomCode)=> {
-    io.to(roomCode).emit("undo");
-  });*/
+  socket.on("undo", (roomCode)=> {
+    io.to(roomCode).emit("undo", roomCode);
+  });
+  socket.on("clear", (roomCode) => {
+    io.to(roomCode).emit("clear", roomCode);
+  })
 });
 
 
