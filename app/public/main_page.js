@@ -578,6 +578,10 @@ socket.on('newTurn', (roomCode) => {
     socket.emit("chooseDrawer", roomCode)
 })
 
+socket.on('endTurn', (roomCode) => {
+    socket.emit('newTurn', roomCode);
+})
+
 socket.on("newRound", (currentRound, numRounds) => {
     console.log("new round")
     let roundText = document.getElementById("roundTracker");
@@ -602,6 +606,7 @@ socket.on('endGame', (roomCode) => {
 
 socket.on("DrawerChosen", (socket_id, username) => { // socket_id is drawer
     currentDrawer = socket_id;
+    generateWords(allWords);
     if(socket_id === socket.id) {
         //console.log("EQUALS")
         popup.style.display = "flex"

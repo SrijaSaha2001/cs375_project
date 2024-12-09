@@ -11,10 +11,6 @@ socket.emit('redirected', code, username);
 socket.emit('joinRoom', code, username);
 socket.emit('updateRoomCode', code, username);
 
-
-let wordCount = document.getElementById("wordcount").value;
-let numHints = document.getElementById("hints").value;
-let customWords = document.getElementById("custom"); 
 let startButton = document.getElementById("start");
 let roomCodeButton = document.getElementById("roomcode");
 

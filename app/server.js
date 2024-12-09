@@ -19,7 +19,7 @@ let roomsAndIntervals = {} // maps room to current draw time interval to clear w
 let roomsAndTurns = {} // maps room to current number of drawing turns per round
 let interval = undefined
 let roomsAndCreators = {} // maps rooms with room creator's socket id
-let roomsUsersPts = {};
+let roomsAndScores = {};
 
 io.on('connection', (socket) => {
   // CREATE NEW ROOM
@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
       roomsAndGuesses[roomCode] = 0;
       roomsAndCorrectGuessers = [];
       roomsAndTurns[roomCode] = 0;
-      roomsUsersPts[roomCode] = {username : 0};
+      roomsAndScores[roomCode] = {};
     }
     roomsAndPlayers[roomCode].push(socket.id);
   });
@@ -193,6 +193,17 @@ io.on('connection', (socket) => {
     //console.log("!!! SOCKET ID: ", socket_id);
     socket.emit('returnSocketId', socket_id);
   })
+  socket.on("newTurn", (roomCode) => {
+    let numPlayers = roomsAndSettings[roomCode]['numPlayers'];
+    if(roomsAndTurns[roomCode] == numPlayers) { // start new round
+      let round = roomsAndRounds[roomCode];
+      io.to(roomCode).emit('endRound', round)
+    }
+    else { // assign next drawer/start new turn
+      io.to(roomCode).emit('newTurn', roomCode);
+    }
+    //io.to(roomCode).emit('newTurn', roomCode);
+  })
   socket.on('startDrawTime', (roomCode) => {
     console.log("starting draw time");
     let drawTime = roomsAndSettings[roomCode]['drawTime'];
@@ -221,7 +232,6 @@ io.on('connection', (socket) => {
       let numRounds = roomsAndSettings[roomCode]['numRounds'];
       if(round == numRounds) {
         io.to(roomCode).emit('endGame', roomCode); // end game after all rounds finish
-        io.to(roomCode).emit("finalScore", {roomCode : roomCode, scores : roomsUsersPts});
       }
       else {
         roomsAndRounds[roomCode]++;
@@ -235,7 +245,11 @@ io.on('connection', (socket) => {
     //let currentUsername = Object.keys(roomsUsersIds[roomCode]).find(key => roomsUsersIds[roomCode][key] === socket_id);
     //console.log("current username: ", currentUsername, " -- user from chat: ", username);
       io.to(roomCode).emit('updateScore', username, 50);
-      roomsUsersPts[roomCode][username] += 50;
+      let namesWithScores = Object.keys(roomsAndScores[roomCode]);
+      if(!namesWithScores.includes(username)) {
+        roomsAndScores[roomCode][username] = 0;
+      }
+      roomsAndScores[roomCode][username] += 50;
       console.log("CORRECT GUESS")
       roomsAndGuesses[roomCode]++;
       let count = roomsAndGuesses[roomCode]; // current number of correct guesses
@@ -260,6 +274,55 @@ io.on('connection', (socket) => {
   });
   socket.on("clear", (roomCode) => {
     io.to(roomCode).emit("clear", roomCode);
+  })
+  socket.on('results', (roomCode) => {
+    let creatorUsername = roomsAndCreators[roomCode];
+    let creatorId = roomsUsersIds[roomCode][creatorUsername];
+    if(creatorId == socket.id) {
+      console.log("Scores: ", roomsAndScores[roomCode]);
+      let players = Object.keys(roomsAndScores[roomCode]);
+      let first = "";
+      let firstPoints = 0;
+      let second = "";
+      let secondPoints = 0;
+      let third = "";
+      let thirdPoints = 0;
+      for(user of players) {
+        let score = roomsAndScores[roomCode][user];
+        if(score > firstPoints) {
+          if(first !== "") {
+            if(second !== "") {
+              third = second;
+              thirdPoints = secondPoints;
+              second = first;
+              secondPoints = firstPoints;
+            }
+            else {
+              second = first;
+              secondPoints = firstPoints;
+            }
+          }
+          first = user;
+          firstPoints = score;
+        }
+        else if(score = firstPoints) {
+          first = first + ", " + user;
+        }
+        else if(score > secondPoints) {
+          if(second !== "") {
+            third = second;
+            thirdPoints = secondPoints;
+          }
+          second = user;
+          secondPoints = score;
+        }
+        else if(score > thirdPoints) {
+          third = user;
+          thirdPoints = score;
+        }
+      }
+      io.to(roomCode).emit("finalScore", {name: first, score: firstPoints}, {name: second, score: secondPoints}, {name: third, score: thirdPoints});
+    }
   })
 });
 
