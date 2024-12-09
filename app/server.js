@@ -6,14 +6,17 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 app.use(express.static('public'));
-let timer = 15 // default countdown before game starts
 let roomsAndPlayers = {} // maps room code to socket ids
 let roomsAndUsernames = {} // maps room code to usernames
 let roomsAndTimers = {}
 let roomsAndRounds = {}
 let roomsAndDrawers = {}
 let roomsUsersIds = {} // maps rooms to usernames and latest socket ids
-let roomsAndSettings = {} // maps rooms to settings (drawTime, numRounds)
+let roomsAndSettings = {} // maps rooms to settings (drawTime, numRounds, numPlayers)
+let roomsAndGuesses = {} // maps room to num of correct guesses per round
+let roomsAndCorrectGuessers = {} // maps room to usernames of players who guess correctly
+let roomsAndIntervals = {} // maps room to current draw time interval to clear when all players guess
+let roomsAndTurns = {} // maps room to current number of drawing turns per round
 let interval = undefined
 let roomsAndCreators = {} // maps rooms with room creator's socket id
 
@@ -27,9 +30,13 @@ io.on('connection', (socket) => {
       roomsAndPlayers[roomCode] = [];
       roomsAndDrawers[roomCode] = [];
       roomsAndUsernames[roomCode] = [];
-      roomsAndTimers[roomCode] = 15;
+      roomsAndTimers[roomCode] = 10;
       roomsUsersIds[roomCode] = {};
       roomsAndSettings[roomCode] = {}; // keeps track of settings
+      roomsAndRounds[roomCode] = 0; // keeps track of what round it is
+      roomsAndGuesses[roomCode] = 0;
+      roomsAndCorrectGuessers = [];
+      roomsAndTurns[roomCode] = 0;
     }
     roomsAndPlayers[roomCode].push(socket.id);
   });
@@ -93,10 +100,11 @@ io.on('connection', (socket) => {
     */
   });
   // Start game when room creator presses "start game" button in settings page
-  socket.on('startGame', (roomCode, drawTime, numRounds) => {
+  socket.on('startGame', (roomCode, drawTime, numRounds, numPlayers) => {
     // Log room settings to determine draw time and number of rounds later
     roomsAndSettings[roomCode]['drawTime'] = drawTime;
     roomsAndSettings[roomCode]['numRounds'] = numRounds;
+    roomsAndSettings[roomCode]['numPlayers'] = numPlayers;
     // console.log("SETTINGS: ", roomsAndSettings[roomCode]); // TESTING
     io.to(roomCode).emit('start', roomCode); // redirects everyone to the main page
     //io.to(roomCode).emit("updateStarterTimer", {roomName: roomCode, startingTimer: 15})
@@ -108,14 +116,14 @@ io.on('connection', (socket) => {
     //console.log("Creator ID: ", creatorId, " --- Passed ID: ", socket.id); // TESTING
     // Only proceed with countdown upon matching creator's socket id
     if(creatorId == socket.id) {
-      let seconds = 15;
+      let seconds = 10;
       let countdown = setInterval(function () {
         if(seconds < 0) {
           //console.log("Clearing interval")
           clearInterval(countdown); 
         }
         else {
-          io.to(roomCode).emit("updateStarterTimer", {roomName: roomCode, startingTimer: seconds});
+          io.to(roomCode).emit("updateStarterTimer", {roomCode: roomCode, startingTimer: seconds});
           seconds--;
         }
       }, 1000);
@@ -136,18 +144,32 @@ io.on('connection', (socket) => {
     }
   }, 1000) */
   socket.on('drawing', (data) => {
-    socket.to(data.roomName).emit('drawing', data);
+    socket.to(data.roomCode).emit('drawing', data);
   });
   socket.on("updateChoice", (data) => {
-    socket.to(data.roomName).emit("updateChoice", {roomName: data.roomName, choice: data.choice})
+    socket.to(data.roomCode).emit("updateChoice", {roomCode: data.roomCode, choice: data.choice})
   })
   socket.on("updateChat", (data) => {
-    socket.to(data.roomName).emit("updateChat", {roomName: data.roomName, chat: data.chat})
+    socket.to(data.roomCode).emit("updateChat", {roomCode: data.roomCode, chat: data.chat})
   });
   socket.on("chooseDrawer", (roomCode) => {
-    let playersIter = io.sockets.adapter.rooms.get(roomCode).values(); // set iterator, current socket ids connected to room
-    let currentPlayers = [...playersIter]; // converts to array of socket ids
-    let pastDrawers = roomsAndDrawers[roomCode];
+    let creatorUsername = roomsAndCreators[roomCode];
+    let creatorId = roomsUsersIds[roomCode][creatorUsername];
+    if(creatorId == socket.id) { // makes sure this is only decided once
+      roomsAndGuesses[roomCode] = 0; // reset count for correct guesses upon new turn
+      let playersIter = io.sockets.adapter.rooms.get(roomCode).values(); // set iterator, current socket ids connected to room
+      let currentPlayers = [...playersIter]; // converts to array of socket ids
+      let i = roomsAndTurns[roomCode]; // turn count used as index to determine next drawer
+      console.log('index: ', i);
+      let drawer = currentPlayers[i]; // choose drawer in order 
+      let drawerUsername = Object.keys(roomsUsersIds[roomCode]).find(key => roomsUsersIds[roomCode][key] === drawer); // get username from socket id
+      console.log("drawer: ", drawerUsername);
+      // console.log(drawerUsername); // TESTING
+      io.to(roomCode).emit("DrawerChosen", drawer, drawerUsername) // sends socket id and username to display on screens
+      roomsAndTurns[roomCode]++;
+    }
+    
+    /*let pastDrawers = roomsAndDrawers[roomCode];
     let drawer = undefined
     for(let i = 0; i < currentPlayers.length; i++) {
       if(!pastDrawers.includes(currentPlayers[i])) {
@@ -155,13 +177,11 @@ io.on('connection', (socket) => {
         //console.log("Drawer: ", drawer); // TESTING
         //roomsAndDrawers[roomCode].push(drawer)
       }
-    }
-    let drawerUsername = Object.keys(roomsUsersIds[roomCode]).find(key => roomsUsersIds[roomCode][key] === drawer); // get username from socket id
-    // console.log(drawerUsername); // TESTING
-    io.to(roomCode).emit("DrawerChosen", drawer, drawerUsername) // sends socket id and username to display on screens
+    } */
+    
   });
   socket.on("updateBlanks", (data) => {
-    io.to(data.roomName).emit("updateBlanks", {blanks: data.blanks})
+    io.to(data.roomCode).emit("updateBlanks", {blanks: data.blanks})
   })
   socket.on('disconnect', () => {
   });
@@ -170,6 +190,66 @@ io.on('connection', (socket) => {
     //console.log("!!! SOCKET ID: ", socket_id);
     socket.emit('returnSocketId', socket_id);
   })
+  socket.on('startDrawTime', (roomCode) => {
+    console.log("starting draw time");
+    let drawTime = roomsAndSettings[roomCode]['drawTime'];
+    console.log("time: ", drawTime);
+    roomsAndIntervals[roomCode] = setInterval(function () { // begin countdown
+      if(drawTime < 1) {
+        clearInterval(roomsAndIntervals[roomCode]);
+        console.log("cleared interval")
+        io.to(roomCode).emit('endTurn', roomCode); // end turn
+      }
+      else {
+        io.to(roomCode).emit('updateDrawTime', drawTime); // update draw time for users
+        drawTime--;
+      }
+    }, 1000);
+  });
+  socket.on('clearPopup', (roomCode, drawerId) => {
+    io.to(roomCode).emit('clearPopup', drawerId);
+  });
+  socket.on('newRound', (roomCode) => {
+    let creatorUsername = roomsAndCreators[roomCode];
+    let creatorId = roomsUsersIds[roomCode][creatorUsername];
+    if(creatorId == socket.id) { // makes sure new round starts only one time
+      console.log("NEW ROUND")
+      let round = roomsAndRounds[roomCode]; // current number of rounds
+      let numRounds = roomsAndSettings[roomCode]['numRounds'];
+      if(round == numRounds) {
+        io.to(roomCode).emit('endGame', roomCode); // end game after all rounds finish
+      }
+      else {
+        roomsAndRounds[roomCode]++;
+        round++;
+        roomsAndTurns[roomCode] = 0; // clear turn count for new rounds
+        io.to(roomCode).emit('newRound', round, numRounds); // send current round and total number of rounds
+      }
+    }
+  });
+  socket.on('correctGuess', (roomCode, username) => { // username is player who sent the chat
+    //let currentUsername = Object.keys(roomsUsersIds[roomCode]).find(key => roomsUsersIds[roomCode][key] === socket_id);
+    //console.log("current username: ", currentUsername, " -- user from chat: ", username);
+      io.to(roomCode).emit('updateScore', username, 50);
+      console.log("CORRECT GUESS")
+      roomsAndGuesses[roomCode]++;
+      let count = roomsAndGuesses[roomCode]; // current number of correct guesses
+      let numPlayers = roomsAndSettings[roomCode]['numPlayers']
+      console.log('guesses: ', count, 'num players: ', numPlayers);
+      if(count === (numPlayers - 1)) { // all guessers have guesses correctly
+        clearInterval(roomsAndIntervals[roomCode]); // clear drawing time interval
+        console.log('interval cleared for correct guess')
+        io.to(roomCode).emit('updateDrawTime', 0); // reset draw time
+        //io.to(roomCode).emit('endTurn', roomCode);
+        if(roomsAndTurns[roomCode] == numPlayers) { // start new round
+          let round = roomsAndRounds[roomCode];
+          io.to(roomCode).emit('endRound', round)
+        }
+        else { // assign next drawer/start new turn
+          io.to(roomCode).emit('newTurn', roomCode);
+        }
+      }
+  });
 });
 
 server.listen(3000, () => {

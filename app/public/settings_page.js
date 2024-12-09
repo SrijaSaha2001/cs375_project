@@ -11,9 +11,7 @@ socket.emit('redirected', code, username);
 socket.emit('joinRoom', code, username);
 socket.emit('updateRoomCode', code, username);
 
-let numPlayers = document.getElementById("numPlayers").value;
-let drawTime = document.getElementById("drawtime").value;
-let numRounds = document.getElementById("rounds").value;
+
 let wordCount = document.getElementById("wordcount").value;
 let numHints = document.getElementById("hints").value;
 let customWords = document.getElementById("custom"); 
@@ -22,12 +20,15 @@ let roomCodeButton = document.getElementById("roomcode");
 
 // Starts game, redirects to main page (gameplay)
 startButton.addEventListener("click", function(event) {
+    let numPlayers = document.getElementById("numPlayers").value;
+    let drawTime = document.getElementById("drawtime").value;
+    let numRounds = document.getElementById("rounds").value;
     let playersTable = document.getElementById("players");
     let currentPlayers = playersTable.childNodes;
     // Validate enough players have joined before starting
     if(currentPlayers.length == numPlayers) {
         //console.log("Enough players!"); // TESTING
-        socket.emit('startGame', code, drawTime, numRounds); // communicates to other players
+        socket.emit('startGame', code, drawTime, numRounds, numPlayers); // communicates to other players
     }
     else {
         // console.log("Not enough players!"); // TESTING
